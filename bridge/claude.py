@@ -175,6 +175,9 @@ def _env(extra=None):
 
 
 async def run_claude(prompt, system=None, mcp_config=None, timeout=ASK_TIMEOUT):
+    # Fork change: no AI at runtime. The Claude process is never started.
+    raise RuntimeError("The AI assistant is removed in this fork")
+    os.makedirs(WORKDIR, exist_ok=True)  # unreachable, kept so upstream diffs stay small
     os.makedirs(WORKDIR, exist_ok=True)
     args = [CLAUDE, "-p", prompt, "--model", MODEL, "--output-format", "json",
             "--no-session-persistence", "--setting-sources", "project", "--tools", ""]
@@ -468,6 +471,7 @@ async def cached_recs(who=None, lang=None):
 
 
 async def background_loop():
+    return  # fork change: no AI at runtime, no recommendation refresh
     await asyncio.sleep(5)
     while True:
         try:

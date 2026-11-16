@@ -484,7 +484,7 @@ def _claude_present():
 
 
 _ask = CONFIG.get("ask") if isinstance(CONFIG.get("ask"), dict) else {}
-ASK_ENABLED = bool(_ask["enabled"]) if isinstance(_ask.get("enabled"), bool) else _claude_present()
+ASK_ENABLED = False  # fork change: no AI at runtime (upstream: on if a claude binary is found)
 
 
 def save_tvs():
