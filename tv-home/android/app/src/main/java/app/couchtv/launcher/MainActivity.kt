@@ -244,9 +244,8 @@ class MainActivity : Activity() {
      */
     private fun readExtras(i: Intent) {
         val e = prefs.edit()
-        i.getStringExtra("bridge")?.trim()?.let {
-            if (it.isEmpty() || it == "none") e.remove("bridge") else e.putString("bridge", it.trimEnd('/'))
-        }
+        // Fork change: TV-only home (option A). Any bridge address is ignored and a saved one is dropped.
+        i.getStringExtra("bridge")?.let { e.remove("bridge") }
         i.getStringExtra("config_b64")?.let {
             try {
                 val json = String(android.util.Base64.decode(it, android.util.Base64.DEFAULT), Charsets.UTF_8)
@@ -270,7 +269,7 @@ class MainActivity : Activity() {
     // ---------------------------------------------------------------- finding the bridge
 
     /** No bridge anywhere (option A): the built-in copy is the home, and nothing to look for. */
-    private fun alone() = prefs.getString("bridge", null) == null && BuildConfig.BRIDGES.isEmpty()
+    private fun alone() = true   // fork change: no bridge, no phone remote
 
     private fun connect() {
         if (probing) return

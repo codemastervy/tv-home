@@ -1,8 +1,6 @@
 #!/bin/sh
 # Builds the couch-tv TV apps (release APKs) and prints where they are.
 #   dist/couch-tv-home.apk    the TV home (options A and B), from tv-home/android
-#   dist/couch-tv-ontv.apk    the "lives on the TV" app (option C), from on-tv/android, if present
-#   dist/couch-tv-sync.apk    the two TVs in sync helper (experimental, docs/SYNC.md), from sync/android, if present
 #
 # Needs JDK 21 and the Android SDK with platform 34 and build tools 34 (docs/SETUP.md, "Building the
 # app"). Gradle itself is not needed: the Gradle wrapper (tv-home/android/gradlew) fetches 8.11.1.
@@ -43,42 +41,4 @@ EXTRA=""
 echo "Building the TV home (settings built in: $CONFIG)"
 "$GW" -p "$ROOT/tv-home/android" --no-daemon -q clean assembleRelease "-PconfigJson=$CONFIG" $EXTRA
 cp "$ROOT/tv-home/android/app/build/outputs/apk/release/app-release.apk" "$ROOT/dist/couch-tv-home.apk"
-OUT="$ROOT/dist/couch-tv-home.apk"
-
-STATUS=0
-if [ -f "$ROOT/on-tv/android/settings.gradle.kts" ] || [ -f "$ROOT/on-tv/android/settings.gradle" ]; then
-  # The on-TV app carries the phone remote inside it, so remote/dist has to exist first. A fresh
-  # clone has no remote/dist (it is a build output), so build it here. Needs Node 20 or newer.
-  if [ ! -f "$ROOT/remote/dist/index.html" ]; then
-    if command -v npm > /dev/null 2>&1; then
-      echo "Building the phone remote first (the on-TV app carries it)"
-      (cd "$ROOT/remote" && npm ci --no-audit --no-fund --loglevel=error && npm run build --silent)
-    else
-      echo "Skipping the on-TV app (option C): it needs the phone remote built first, and that needs"
-      echo "Node 20 or newer (npm), which this computer does not have. Install Node and run this again,"
-      echo "or download couch-tv-ontv.apk from the GitHub Releases page."
-      STATUS=1
-    fi
-  fi
-  if [ -f "$ROOT/remote/dist/index.html" ]; then
-    echo "Building the on-TV app (option C)"
-    "$GW" -p "$ROOT/on-tv/android" --no-daemon -q clean assembleRelease
-    cp "$ROOT/on-tv/android/app/build/outputs/apk/release/app-release.apk" "$ROOT/dist/couch-tv-ontv.apk"
-    OUT="$OUT
-$ROOT/dist/couch-tv-ontv.apk"
-  fi
-fi
-
-if [ -f "$ROOT/sync/android/settings.gradle.kts" ]; then
-  echo "Building the sync helper (two TVs in sync, experimental)"
-  "$GW" -p "$ROOT/sync/android" --no-daemon -q clean assembleRelease
-  cp "$ROOT/sync/android/app/build/outputs/apk/release/app-release.apk" "$ROOT/dist/couch-tv-sync.apk"
-  OUT="$OUT
-$ROOT/dist/couch-tv-sync.apk"
-fi
-
-echo "Built:"
-echo "$OUT" | while read -r f; do
-  echo "  $f  sha256 $(shasum -a 256 "$f" 2>/dev/null | cut -d' ' -f1 || sha256sum "$f" | cut -d' ' -f1)"
-done
-exit $STATUS
+echo "Built: $ROOT/dist/couch-tv-home.apk"
