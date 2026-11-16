@@ -2249,7 +2249,7 @@
   function refreshCards(force) {
     var src = HOME.custom_cards, CC = window.CustomCards;
     // Fork: home.picks (own picks from the config) in a random order, used when no custom_cards link is set
-    if (!src && CC && Array.isArray(HOME.picks) && HOME.picks.length) { setCards(CC.picks(HOME.picks)); return; }
+    if (!src && CC && ownPicks().length) { setCards(CC.picks(ownPicks())); return; }
     if (!src || !CC) return;
     // a link: the on-TV app (or a home with no computer) reads it itself, so it needs CORS
     var direct = function () {
@@ -3370,7 +3370,7 @@
   // also on the computer (/api/settings), so the phone and the TV agree.
   var ST_KEY = "tvhome.settings";
   var SECS = [["language", "globe"], ["location", "pin"], ["weather", "cloud"], ["look", "look"],
-    ["apps", "apps"], ["people", "person"], ["quick", "bolt"], ["about", "info"]];
+    ["apps", "apps"], ["picks", "apps"], ["people", "person"], ["quick", "bolt"], ["about", "info"]];
   var SET = { col: "secs", sec: 0, ri: 0, keyFocus: null, sub: null, lift: null, confirm: null, dirty: false, typing: null,
     msg: "", geo: { q: "", list: null, busy: false, err: false } };
   var REPO_URL = "github.com/Seagey/couch-tv";
@@ -3462,6 +3462,27 @@
   function head(label) { return { kind: "head", key: "h:" + label, label: label }; }
   function info(key, label, value, sub) { return { kind: "info", key: key, label: label, value: value, sub: sub }; }
 
+  // ---- own picks (fork): chosen on the TV from a fixed list of apps, same card shape as home.picks ----
+  var PICK_CHOICES = [["YouTube", "com.google.android.youtube.tv"], ["Netflix", "com.netflix.ninja"],
+    ["Disney+", "com.disney.disneyplus"], ["Prime Video", "com.amazon.amazonvideo.livingroom"],
+    ["Apple TV", "com.apple.atve.androidtv.appletv"], ["Spotify", "com.spotify.tv.android"],
+    ["YouTube Music", "com.google.android.youtube.tvmusic"], ["Plex", "com.plexapp.android"],
+    ["Kodi", "org.xbmc.kodi"], ["Twitch", "tv.twitch.android.app"]];
+  // What the home shows: picks chosen on this TV win over home.picks in the config.
+  function ownPicks() { return Array.isArray(ST.picks) ? ST.picks : (Array.isArray(HOME.picks) ? HOME.picks : []); }
+  function picksRows() {
+    var cur = ownPicks(), rows = [head(t("picks_head")), info("picks-sub", t("picks_sub"))];
+    PICK_CHOICES.forEach(function (c) {
+      var on = cur.some(function (x) { return x && x.app === c[1]; });
+      rows.push({ kind: "check", key: "pick:" + c[1], label: c[0], checked: on, act: function () {
+        var list = cur.filter(function (x) { return x && x.app !== c[1]; });
+        if (!on) list.push({ title: c[0], app: c[1] });
+        ST.picks = list.slice(0, 8); saveSettings();
+      } });
+    });
+    return rows;
+  }
+
   function sectionRows(id) {
     if (id === "updates") return updateRows();
     if (id === "language") return languageRows();
@@ -3469,6 +3490,7 @@
     if (id === "weather") return weatherRows();
     if (id === "look") return lookRows();
     if (id === "apps") return appsRows();
+    if (id === "picks") return picksRows();
     if (id === "people") return peopleRows();
     if (id === "quick") return quickRows();
     return aboutRows();
@@ -4823,7 +4845,10 @@
     });
   }
   function sortApps(list) {
+    var mine = Array.isArray(HOME.app_order) ? HOME.app_order : [];   // fork: setup writes home.app_order
     var rank = function (p) {
+      var m = mine.indexOf(p);
+      if (m >= 0) return m - 5000;
       var i = APP_ORDER.indexOf(p);
       if (i >= 0) return i;
       i = APP_LAST.indexOf(p);
@@ -5047,7 +5072,7 @@
     startVideo();
     photoTimer = setInterval(nextPhoto, PHOTO_MS);
     // custom cards (home.custom_cards): every 10 minutes, and never before the home is drawn
-    if ((HOME.custom_cards || (Array.isArray(HOME.picks) && HOME.picks.length)) && window.CustomCards) {
+    if ((HOME.custom_cards || ownPicks().length) && window.CustomCards) {
       setTimeout(refreshCards, 1500);
       setInterval(refreshCards, window.CustomCards.EVERY_MIN * 60000);
     }
