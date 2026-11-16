@@ -46,5 +46,18 @@
     try { return clean(JSON.parse(s)); } catch (e) { return null; }
   }
 
-  root.CustomCards = { clean: clean, parse: parse, MAX: MAX_CARDS, EVERY_MIN: 10 };
+  // Fork: "my own picks". home.picks is a list of cards (same fields as custom cards) kept in the
+  // config, never fetched. Each time the home opens they are shown in a random order (the first
+  // MAX_CARDS of a shuffle). rnd is injectable so the test can pin the order.
+  function shuffle(list, rnd) {
+    rnd = rnd || Math.random;
+    var a = Array.isArray(list) ? list.slice() : [];
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(rnd() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+  function picks(list, rnd) { return clean(shuffle(clean(list), rnd)); }
+
+  root.CustomCards = { clean: clean, parse: parse, shuffle: shuffle, picks: picks, MAX: MAX_CARDS, EVERY_MIN: 10 };
 })(typeof window !== "undefined" ? window : this);

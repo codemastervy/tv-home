@@ -31,7 +31,12 @@
     "scene_seconds": 20,
     "dock_size": 10,
     "sun_sync": false,
-    "hide_packages": []
+    "hide_packages": [],
+    "picks": [
+      { "title": "REPLACE: pick 1", "subtitle": "REPLACE: app or show", "app": "com.google.android.youtube.tv" },
+      { "title": "REPLACE: pick 2", "subtitle": "REPLACE", "app": "com.netflix.ninja" },
+      { "title": "REPLACE: pick 3", "subtitle": "REPLACE", "url": "https://example.com" }
+    ]
   },
   "phone_remote": true,
   "ask": { "enabled": false },

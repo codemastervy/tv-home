@@ -2248,6 +2248,8 @@
   }
   function refreshCards(force) {
     var src = HOME.custom_cards, CC = window.CustomCards;
+    // Fork: home.picks (own picks from the config) in a random order, used when no custom_cards link is set
+    if (!src && CC && Array.isArray(HOME.picks) && HOME.picks.length) { setCards(CC.picks(HOME.picks)); return; }
     if (!src || !CC) return;
     // a link: the on-TV app (or a home with no computer) reads it itself, so it needs CORS
     var direct = function () {
@@ -5045,7 +5047,7 @@
     startVideo();
     photoTimer = setInterval(nextPhoto, PHOTO_MS);
     // custom cards (home.custom_cards): every 10 minutes, and never before the home is drawn
-    if (HOME.custom_cards && window.CustomCards) {
+    if ((HOME.custom_cards || (Array.isArray(HOME.picks) && HOME.picks.length)) && window.CustomCards) {
       setTimeout(refreshCards, 1500);
       setInterval(refreshCards, window.CustomCards.EVERY_MIN * 60000);
     }

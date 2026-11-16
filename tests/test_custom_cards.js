@@ -73,7 +73,9 @@ assert(start > 0 && body.length > 100, "addCards found");
 assert(!/innerHTML|outerHTML|insertAdjacentHTML|eval\(|Function\(|setAttribute\("on/.test(body), "addCards never parses HTML or code");
 assert(/textContent = text/.test(body), "card text goes in with textContent");
 // off by default: nothing is fetched unless home.custom_cards is set
-assert(/if \(HOME\.custom_cards && window\.CustomCards\) \{/.test(appJs), "no fetching unless set");
+// (fork: the scheduler also runs for home.picks, which is read from the config and never fetched)
+assert(/if \(\(HOME\.custom_cards \|\| \(Array\.isArray\(HOME\.picks\) && HOME\.picks\.length\)\) && window\.CustomCards\) \{/.test(appJs), "no fetching unless set");
+assert(/if \(!src && CC && Array\.isArray\(HOME\.picks\)[^\n]*return; \}/.test(appJs), "picks never fetch");
 // cards.js loads before app.js
 const html = fs.readFileSync(path.join(web, "index.html"), "utf8");
 assert(html.indexOf('src="cards.js"') > 0 && html.indexOf('src="cards.js"') < html.indexOf('src="app.js"'), "cards.js before app.js");
