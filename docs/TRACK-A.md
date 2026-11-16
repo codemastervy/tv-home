@@ -30,7 +30,7 @@ address, not a QR. Control of the TV comes from Home Assistant's own remote (Tra
   installed app package or an http(s) link). They show in random order on each open in the shelf, at most 8,
   and D-pad scrolls them (`tests/test_picks_row.js`, `tests/emulator/picks_row.py`). They are not fetched
   from apps: no public API gives an app's recommendations. Your own list is the source, as the brief allowed.
-  The three entries in `config.example.json` are marked `REPLACE`.
+  The setup (SETUP.md) writes them; `tests/emulator/test-config.json` has test ones.
 
 ## Tests
 - Unit/JS: `for f in tests/*.js; do node $f; done` and `sh tests/test_no_ads.sh`.

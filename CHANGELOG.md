@@ -14,3 +14,7 @@ This fork is the guest/rental TV home only (couch-tv option A): no phone remote,
 - Self-update off by default (`updateRepo` empty).
 - Tests: tests/test_no_ads.sh; tests/emulator/{focus_order,continue_watching,picks_row}.py + run_all.sh.
 - docs/TRACK-A.md: what is kept/removed and what is only emulator-proven.
+- Setup: `setup.py` / `setup.sh` (one question at a time, fixed lists, writes git-ignored config.json) and SETUP.md for a person or an
+  AI agent; `home.app_order`; the TV's Home settings gains an Own picks section. Tests: tests/test_setup.py, tests/emulator/setup_screen.py.
+- Removed the broken `apply.sh`/`home-config.py` (they needed the removed bridge); `tv-home/tools/install.sh` replaces them (emulator-only by default).
+- New README and own screenshots in docs/screens/ (upstream's screenshots removed).
