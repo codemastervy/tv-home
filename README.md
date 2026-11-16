@@ -1,3 +1,8 @@
+> **This is a personal fork (TV home only).** The phone remote, the bridge, the QR/remote web app, the Claude
+> assistant and the other TV brands were removed; control comes from Home Assistant. See
+> [docs/TRACK-A.md](docs/TRACK-A.md) and [CHANGELOG.md](CHANGELOG.md). The text below is upstream's and
+> still mentions the removed parts.
+
 <p align="center"><img src="docs/screens/banner.png" alt="couch-tv on a TV: the Night home screen with the glass clock, Keep watching and the app dock" width="100%"></p>
 
 <p align="center">
