@@ -1,0 +1,17 @@
+{
+  "people": [{ "id": "home", "name": "Home" }],
+  "home": {
+    "look": "night",
+    "scenes": ["night", "golden"],
+    "dock_size": 10,
+    "sun_sync": false,
+    "hide_packages": [],
+    "app_order": ["com.google.android.youtube.tv"],
+    "picks": [
+      { "title": "Test pick 1", "subtitle": "a", "app": "com.google.android.youtube.tv" },
+      { "title": "Test pick 2", "subtitle": "b", "app": "com.netflix.ninja" },
+      { "title": "Test pick 3", "subtitle": "c", "url": "https://example.com" }
+    ]
+  },
+  "weather": { "lat": -41.29, "lon": 174.78, "place": "Testville", "timezone": "Pacific/Auckland" }
+}

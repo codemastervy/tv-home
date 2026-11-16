@@ -15,6 +15,7 @@
 # a fork with releases of its own sets it, and UPDATE_REPO= (empty) switches updates off.
 set -e
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
+[ -f "$ROOT/config.json" ] && CONFIG=${CONFIG:-$ROOT/config.json}
 CONFIG=${CONFIG:-$ROOT/config.example.json}
 case "$CONFIG" in /*) ;; *) CONFIG="$ROOT/$CONFIG" ;; esac
 

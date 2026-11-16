@@ -22,6 +22,14 @@ def clear_seeded():
         adb("shell", f"content delete --uri {URI}/{m.group(1)}")
 
 
+def clear_seeded():
+    """The provider refuses selections, so delete by row id (rows seeded from adb shell belong to com.android.shell)."""
+    import re
+    out = adb("shell", f"content query --uri {URI} --projection _id:package_name")
+    for m in re.finditer(r"_id=(\d+), package_name=com\.android\.shell", out):
+        adb("shell", f"content delete --uri {URI}/{m.group(1)}")
+
+
 async def page_text():
     pid = adb("shell", "pidof", PKG).strip()
     adb("forward", f"tcp:{PORT}", f"localabstract:webview_devtools_remote_{pid}")

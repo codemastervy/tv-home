@@ -68,11 +68,11 @@ async def main():
     try:
         # DOWN x? reaches the shelf row; walk RIGHT through the cards, focus must advance on picks
         got = []
-        for k in ["KEYCODE_DPAD_DOWN"] + ["KEYCODE_DPAD_RIGHT"] * 4:   # DOWN lands on the shelf, RIGHT scrolls along it
+        for k in ["KEYCODE_DPAD_UP"] + ["KEYCODE_DPAD_RIGHT"] * 4:   # UP from the apps lands on the shelf, RIGHT scrolls along it
             adb("shell", "input", "keyevent", k); time.sleep(.6)
             got.append(await ev("(document.querySelector('.focus')||{}).textContent||''"))
         print(got)
-        picks_focused = [g for g in got if "REPLACE" in g]
+        picks_focused = [g for g in got if "Test pick" in g]
         assert len(set(picks_focused)) >= 2, "D-pad did not scroll through the picks"
     finally:
         await ws.close()
