@@ -3634,7 +3634,7 @@
 
   // ---- What's on: the wallpaper, Gemini, one row per streaming app, TMDB
   function recoRows() {
-    var c = Reco.cfg(), rows = [head(t("r_head")), info("reco-sub", t("r_sub"))];
+    var c = Reco.cfg(), rows = [info("reco-sub", t("r_sub"))];
     rows.push({ kind: "check", key: "r:wall", label: t("r_wallpaper"), sub: t("r_wallpaper_sub"), checked: c.home.wallpaper,
       act: function () { ST.wallpaper = !c.home.wallpaper; saveSettings(); Reco.apply(); } });
     rows.push({ kind: "check", key: "r:gem", label: t("r_gemini"), sub: t("r_gemini_sub"), checked: c.home.gemini,

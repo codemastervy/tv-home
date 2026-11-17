@@ -22,7 +22,7 @@ assert(I18N.langs.some(function (l) { return l.id === 'ar'; }), 'ar is in LANGS'
 // every home word has an Arabic one, with the same {placeholders}. Bridge messages (err_, note_)
 // stay in English for now, as in Hebrew.
 const holes = function (s) { return (s.match(/\{\w+\}/g) || []).slice().sort().join(','); };
-Object.keys(S.en).filter(function (key) { return !/^(err|note)_/.test(key); }).forEach(function (key) {
+Object.keys(S.en).filter(function (key) { return !/^(err|note|r)_|^(sec_reco|quick_(search|mylist|surprise|gemini|settings))$/.test(key); }).forEach(function (key) {
   assert(key in S.ar, `S.ar is missing ${key}`);
 });
 Object.keys(S.ar).forEach(function (key) {

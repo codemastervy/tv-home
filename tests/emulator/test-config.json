@@ -2,15 +2,28 @@
   "demo": true,
   "home": {
     "wallpaper": true,
-    "scenes": ["night", "golden", "water"],
+    "scenes": [
+      "night",
+      "golden",
+      "water"
+    ],
     "scene_seconds": 600,
-    "app_order": ["com.netflix.ninja", "com.disney.disneyplus", "com.amazon.amazonvideo.livingroom", "com.apple.atve.androidtv.appletv", "com.google.android.youtube.tv"],
+    "app_order": [
+      "com.netflix.ninja",
+      "com.disney.disneyplus",
+      "com.amazon.amazonvideo.livingroom",
+      "com.apple.atve.androidtv.appletv",
+      "com.google.android.youtube.tv"
+    ],
     "platform_rows": {},
     "gemini": true,
     "clock": "12",
     "show_date": true,
     "picks": []
   },
-  "tmdb": { "enabled": true, "api_key": "0123456789abcdef0123456789abcdef", "region": "NZ" },
-  "weather": { "lat": -41.29, "lon": 174.78, "place": "Wellington", "timezone": "Pacific/Auckland" }
+  "tmdb": {
+    "enabled": true,
+    "api_key": "0123456789abcdef0123456789abcdef",
+    "region": "NZ"
+  }
 }

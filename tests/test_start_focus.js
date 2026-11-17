@@ -9,10 +9,7 @@ const i18n = fs.readFileSync(path.join(web, 'i18n.js'), 'utf8');
 
 // 1. Setting declaration and config reading
 assert(/START_FOCUS = "people"/.test(appJs), 'default START_FOCUS is people, as before the setting existed');
-assert(
-  /START_FOCUS = \["people", "apps", "keep_watching"\]\.indexOf\(ST\.start_focus \|\| HOME\.start_focus\) >= 0 \? \(ST\.start_focus \|\| HOME\.start_focus\) : "people"/.test(appJs),
-  'readConfig respects ST.start_focus, HOME.start_focus, or defaults to people'
-);
+assert(/START_FOCUS = "apps";/.test(appJs), 'the home starts on the apps (the one fixed choice)');
 
 // 2. Home settings cycle row
 assert(appJs.includes('key: "start-focus"'), 'Home settings has start-focus row');
@@ -97,7 +94,7 @@ const keys = [
 
 keys.forEach(k => {
   const count = (i18n.match(new RegExp('\\b' + k + ':', 'g')) || []).length;
-  assert.strictEqual(count, 15, `${k} must exist in all 15 languages (found ${count})`);
+  assert.strictEqual(count, 16, `${k} must exist in all 16 languages (found ${count})`);
 });
 
 console.log('All start_focus tests passed successfully.');

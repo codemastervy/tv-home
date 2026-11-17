@@ -7,7 +7,7 @@ import websockets
 SERIAL = sys.argv[1] if len(sys.argv) > 1 else "emulator-5554"
 assert SERIAL.startswith("emulator-"), "emulator only"
 PKG, PORT = "app.couchtv.launcher", 9336
-SECTIONS = ["Language", "Location", "Weather", "Look and scenes", "Apps", "Own picks", "People", "Quick buttons", "About"]
+SECTIONS = ["What's on", "Language", "Location", "Weather", "Look and scenes", "Apps", "Own picks", "Quick buttons", "About"]
 PICKS = ["YouTube", "Netflix", "Disney+", "Prime Video", "Apple TV", "Spotify", "YouTube Music", "Plex", "Kodi", "Twitch"]
 
 
@@ -79,8 +79,8 @@ async def main():
                 shot("setup-" + got[-1].split()[0].lower())
         print("sections:", got)
         assert got == SECTIONS, f"section order differs: {got}"
-        for _ in range(3):
-            key("DPAD_UP")                      # About -> Quick -> People -> Own picks
+        for _ in range(2):
+            key("DPAD_UP")                      # About -> Quick -> Own picks
         assert await ev(txt(".ssec.focus,.ssec.on")) == "Own picks"
         key("DPAD_RIGHT")                       # into the rows
         shot("setup-picks")
