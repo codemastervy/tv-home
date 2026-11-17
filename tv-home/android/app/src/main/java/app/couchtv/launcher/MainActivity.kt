@@ -629,6 +629,22 @@ class MainActivity : Activity() {
         @JavascriptInterface
         fun watchNext(): String = readWatchNext().toString()
 
+        /** What apps publish as preview-channel programs (TvContract), plus a short diagnosis, as JSON. */
+        @JavascriptInterface
+        fun published(): String = readPublished().toString()
+
+        /** Opens a published program by its row id in the app that owns it. */
+        @JavascriptInterface
+        fun openPublished(id: String): Boolean = openPublishedItem(id)
+
+        /** The TV's own assistant (Gemini on Google TV) through the system assist intents. False if none answers. */
+        @JavascriptInterface
+        fun assist(): Boolean = openAssistant()
+
+        /** Hands a typed question to the TV's own assistant (system intents only; this app contains no AI). */
+        @JavascriptInterface
+        fun assistQuery(q: String): Boolean = openAssistant(q)
+
         /** Opens one Watch Next item (its row id) in the app that owns it. */
         @JavascriptInterface
         fun openWatchNext(id: String): Boolean = openWatchNextItem(id)
@@ -1327,6 +1343,82 @@ class MainActivity : Activity() {
     }
 
     /** A Watch Next row's app and link, by its row id. */
+    /**
+     * Preview-channel programs of every other app, as the system TV provider hands them to a plain
+     * (non-system) app holding READ_TV_LISTINGS. "diag" says what was readable, for docs/RECOMMENDATIONS.md.
+     */
+    private fun readPublished(): JSONObject {
+        val out = JSONObject()
+        val items = JSONArray()
+        val diag = JSONObject().put("permission", checkSelfPermission(READ_TV) == PackageManager.PERMISSION_GRANTED)
+        out.put("items", items).put("diag", diag)
+        if (!diag.getBoolean("permission")) return out
+        val names = HashMap<Long, String>()
+        val perPkg = JSONObject()
+        try {
+            contentResolver.query(TV_CHANNELS, arrayOf("_id", "package_name", "display_name"), null, null, null)?.use { c ->
+                diag.put("channels", c.count)
+                while (c.moveToNext()) names[c.getLong(0)] = c.getString(2) ?: ""
+            }
+        } catch (e: Exception) { diag.put("channelsError", e.javaClass.simpleName) }
+        try {
+            val cols = arrayOf("_id", "package_name", "channel_id", "title", "short_description", "poster_art_uri",
+                "thumbnail_uri", "canonical_genre", "type")
+            contentResolver.query(PREVIEW_PROGRAMS, cols, null, null, "_id ASC")?.use { c ->
+                diag.put("previewPrograms", c.count)
+                while (c.moveToNext() && items.length() < 200) {
+                    val pkg = c.getString(1) ?: continue
+                    val title = c.getString(3)?.takeIf { it.isNotBlank() } ?: continue
+                    if (pkg == packageName) continue
+                    perPkg.put(pkg, perPkg.optInt(pkg, 0) + 1)
+                    val art = c.getString(6)?.takeIf { it.isNotBlank() } ?: c.getString(5)?.takeIf { it.isNotBlank() }
+                    if (art != null) watchNextArtSeen.add(art)
+                    items.put(JSONObject().apply {
+                        put("id", "pp:" + c.getLong(0))
+                        put("title", title)
+                        put("desc", c.getString(4) ?: "")
+                        put("genre", c.getString(7) ?: "")
+                        put("type", c.getInt(8))
+                        put("channel", names[c.getLong(2)] ?: "")
+                        put("package", pkg)
+                        if (art != null) put("art", artRoute(art))
+                    })
+                }
+            }
+        } catch (e: Exception) { diag.put("programsError", e.javaClass.simpleName + ": " + (e.message ?: "")) }
+        diag.put("perPackage", perPkg)
+        return out
+    }
+
+    private fun openPublishedItem(id: String): Boolean {
+        val m = Regex("pp:([0-9]{1,18})").matchEntire(id) ?: return false
+        try {
+            val uri = android.content.ContentUris.withAppendedId(PREVIEW_PROGRAMS, m.groupValues[1].toLong())
+            contentResolver.query(uri, arrayOf("package_name", "intent_uri"), null, null, null)?.use { c ->
+                if (c.moveToFirst()) {
+                    val pkg = c.getString(0) ?: return false
+                    val raw = c.getString(1)
+                    if (!raw.isNullOrBlank() && openShowLink(raw, pkg)) return true
+                    return launchPackage(pkg)
+                }
+            }
+        } catch (e: Exception) {}
+        return false
+    }
+
+    private fun openAssistant(query: String? = null): Boolean {
+        val q = query?.replace(Regex("[\\u0000-\\u001f\\u007f]+"), " ")?.trim()?.take(200)
+        if (!q.isNullOrEmpty()) {
+            // the query goes in as an intent extra only: never into a shell, a file path or a URL
+            val withQ = listOf(Intent(Intent.ACTION_ASSIST).putExtra(android.app.SearchManager.QUERY, q),
+                Intent(Intent.ACTION_SEARCH).putExtra(android.app.SearchManager.QUERY, q))
+            for (i in withQ) { i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); if (start(i)) return true }
+        }
+        val tries = listOf(Intent(Intent.ACTION_ASSIST), Intent("android.intent.action.VOICE_ASSIST"), Intent(Intent.ACTION_VOICE_COMMAND))
+        for (i in tries) { i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); if (start(i)) return true }
+        return false
+    }
+
     private fun watchNextRow(id: String): Pair<String, String?>? {
         if (!Regex("[0-9]{1,18}").matches(id)) return null
         val uri = android.content.ContentUris.withAppendedId(WATCH_NEXT, id.toLong())
