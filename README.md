@@ -61,3 +61,5 @@ Uninstall it (`adb uninstall app.couchtv.launcher`). The TV's own home was never
 ## Credit
 Original project and design: Seagey/couch-tv (MIT, copyright kept in [LICENSE](LICENSE)). Wallpaper photos and fonts keep their
 credits in `tv-home/web/backgrounds/CREDITS.md`.
+
+The settings gear icon is from [Feather](https://github.com/feathericons/feather) (MIT).
