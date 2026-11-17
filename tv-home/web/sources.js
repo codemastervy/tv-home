@@ -69,7 +69,7 @@
   // "What's on <platform>": the app's own published entries first (they are personalised by the app),
   // then TMDB seeded by the taste genres of My List + Continue watching, then rent/buy offers.
   function platformRow(cfg, p, ctx) {
-    var own = ctx.published.filter(function (x) { return x.platform === p.id; });
+    var own = cfg.demo ? [] : ctx.published.filter(function (x) { return x.platform === p.id; });   // sample mode shows sample titles only
     own = L.rank(own, ctx.taste);
     if (cfg.demo) {
       var d = root.DEMO.catalog.filter(function (x) { return x.platform === p.id; });

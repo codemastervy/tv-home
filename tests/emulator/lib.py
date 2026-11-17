@@ -67,6 +67,6 @@ def start(config_settings=None):
 
 
 async def set_settings(p, st):
-    s = json.dumps(json.dumps(st))
+    s = json.dumps(json.dumps({"s": st, "updated": 1, "pending": False}))
     await p.ev(f"TVOS.keep('tvhome.settings', {s}); localStorage.setItem('tvhome.settings', {s}); location.reload(); 1")
     time.sleep(5)

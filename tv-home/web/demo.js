@@ -30,23 +30,67 @@
     youtube: [["Pocket Kitchen", "Cooking, 12 min", [99], "stream", "movie"], ["Tiny Trains of Europe", "Documentary, 24 min", [99], "stream", "movie"],
       ["Sunday Comedy Hour", "Stand-up special", [35], "stream", "movie"], ["Ocean Floor Live", "Nature, 41 min", [99], "stream", "movie"]]
   };
+  var PKG = {};
+  if (root.Logic) root.Logic.PLATFORMS.forEach(function (p) { PKG[p.id] = p.pkg; });
   var DESC = "A short invented description for the sample data, so the banner has a line of text to show under the title.";
   var catalog = [], n = 0;
   Object.keys(T).forEach(function (pid) {
     T[pid].forEach(function (r) {
       n++;
       var h = HUES[pid];
-      catalog.push({ title: r[0], sub: r[1], genres: r[2], avail: r[3], kind: r[4], platform: pid, desc: DESC,
+      catalog.push({ title: r[0], sub: r[1], genres: r[2], avail: r[3], kind: r[4], platform: pid, pkg: PKG[pid], desc: DESC,
         art: art(n, h[0] + (n * 17) % 60, h[1] + (n * 11) % 50), source: "demo" });
     });
   });
   var watching = [["Harbour Lights", "netflix", "S2 E4", 0.62], ["Little Comet", "disney", "1h 12m left", 0.4], ["Night Shift Detectives", "prime", "S3 E7", 0.8],
     ["The Understudy", "appletv", "S1 E3", 0.25]].map(function (w, i) {
     var base = catalog.filter(function (c) { return c.title === w[0]; })[0];
-    return { title: w[0], sub: w[2], platform: w[1], genres: base.genres, art: art(40 + i, HUES[w[1]][0] + 30, HUES[w[1]][1] + 20), progress: w[3], source: "demo", desc: DESC };
+    return { title: w[0], sub: w[2], platform: w[1], pkg: PKG[w[1]], genres: base.genres, art: art(40 + i, HUES[w[1]][0] + 30, HUES[w[1]][1] + 20), progress: w[3], source: "demo", desc: DESC };
   });
   var picks = [["Friday film night", "netflix"], ["Kids pick", "disney"], ["Documentary night", "youtube"]].map(function (p, i) {
     return { title: p[0], sub: "Your pick", platform: p[1], art: art(70 + i, 150 + i * 40, 190 + i * 40), source: "pick" };
   });
   root.DEMO = { catalog: catalog, watching: watching, picks: picks, installed: Object.keys(HUES).map(function (k) { return k; }), art: art };
+})(typeof window !== "undefined" ? window : this);
+
+// Sample mode only (config "demo": true): stand in for the parts of the TV the sample titles need, so
+// the home can be shown and tested on an emulator with none of the streaming apps installed. It wraps
+// the real TVOS bridge and only adds the sample apps, their icons and a sample Continue watching.
+(function (root) {
+  var cfg = root.COUCH_CONFIG;
+  if (!cfg || cfg.demo !== true || !root.TVOS || !root.Logic) return;
+  var real = root.TVOS, L = root.Logic, D = root.DEMO;
+  function icon(p) {
+    var s = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><rect width="96" height="96" fill="' + p.color + '"/>' +
+      '<text x="48" y="64" font-family="sans-serif" font-size="52" font-weight="700" fill="#fff" text-anchor="middle">' + p.name.charAt(0) + '</text></svg>';
+    return "data:image/svg+xml;utf8," + encodeURIComponent(s);
+  }
+  var fake = {};
+  L.PLATFORMS.forEach(function (p) { fake[p.pkg] = p; });
+  var over = {
+    apps: function () {
+      var list = [];
+      try { list = JSON.parse(real.apps()); } catch (e) {}
+      var have = {};
+      list.forEach(function (a) { have[a["package"]] = 1; });
+      L.PLATFORMS.forEach(function (p) { if (!have[p.pkg]) list.push({ "package": p.pkg, label: p.name, hasBanner: false }); });
+      return JSON.stringify(list);
+    },
+    iconUrl: function (pkg) { return fake[pkg] ? icon(fake[pkg]) : typeof real.iconUrl === "function" ? real.iconUrl(pkg) : "http://tvos.invalid/icon/" + pkg; },
+    bannerUrl: function (pkg) { return fake[pkg] ? icon(fake[pkg]) : typeof real.bannerUrl === "function" ? real.bannerUrl(pkg) : "http://tvos.invalid/banner/" + pkg; },
+    launch: function (pkg) { return fake[pkg] ? true : real.launch(pkg); },
+    watchNext: function () {
+      return JSON.stringify(D.watching.map(function (w, i) {
+        var p = L.PLATFORMS.filter(function (x) { return x.id === w.platform; })[0];
+        var m = /^S(\d+) E(\d+)$/.exec(w.sub);
+        return { id: 9000 + i, title: w.title, season: m ? +m[1] : null, episode: m ? +m[2] : null, episode_title: m ? null : w.sub,
+          backdrop: w.art, progress: w.progress, app: { "package": p.pkg, name: p.name }, engaged: 100 - i };
+      }));
+    },
+    openWatchNext: function () { return true; },
+    openPublished: function () { return true; }
+  };
+  root.TVOS = typeof Proxy === "function" ? new Proxy(real, {
+    get: function (t, k) { if (Object.prototype.hasOwnProperty.call(over, k)) return over[k]; var v = t[k]; return typeof v === "function" ? v.bind(t) : v; }
+  }) : real;
 })(typeof window !== "undefined" ? window : this);

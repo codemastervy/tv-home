@@ -42,7 +42,25 @@
     devmode_not_renewed: "Developer Mode has not been renewed for {days} days. It renews the next time the TV is on.",
 
     // ---- the home ----
-    keep_watching: "Keep watching",
+    keep_watching: "Continue watching",
+    // ---- What's on (reco.js)
+    r_hero_empty: "Nothing to show yet", r_hero_empty_sub: "Open a streaming app and what is on will show up here.",
+    r_avail_rent: "Rent", r_avail_buy: "Buy", r_open_app: "Open", r_open: "Open", r_in_list: "In My List", r_add_list: "Add to My List",
+    r_remove_list: "Remove from My List", r_close: "Close", r_nothing_yet: "Nothing from {app} yet",
+    r_whats_on: "What's on {app}", r_opening_search: "Opening {app}. Look for {title} there.", r_cant_open: "Could not open that",
+    r_added: "Added {title} to My List", r_removed: "Removed {title} from My List", r_no_assistant: "This TV has no assistant to hand that to",
+    r_space: "Space", r_delete: "Delete", r_ask: "Ask Gemini", r_ask_q: "Ask Gemini: {q}", r_search: "Search", r_type_hint: "Type a title, or pick a genre",
+    r_on_apps: "On your apps", r_results: "Results", r_searching: "Searching...", r_no_results: "Nothing found on your apps", r_no_platforms: "No streaming apps found on this TV",
+    r_my_list: "My List", r_n_titles: "{n} titles", r_n_title: "{n} title", r_list_empty: "Nothing here yet. Add titles from the banner, a card or Search.", r_list_hint: "OK opens it. Hold OK for more.",
+    r_surprise: "Surprise me", r_nothing_to_pick: "Nothing to pick from yet.", r_another: "Another one", r_surprise_q: "Want to watch it on {app}?",
+    r_remove_cw: "Remove from Continue watching",
+    r_head: "What's on", r_sub: "Rows come from what your apps publish to this TV, and from TMDB if you switch it on. Only apps you have.",
+    r_wallpaper: "Wallpaper", r_wallpaper_sub: "Off: the banner shows what is recommended instead of the scenes",
+    r_gemini: "Gemini button", r_gemini_sub: "Hands a question to this TV's own assistant. Nothing is asked inside this app.",
+    r_platforms: "Rows", r_no_platforms_row: "", r_tmdb: "TMDB", r_tmdb_use: "More titles from TMDB",
+    r_tmdb_key_set: "On: asks api.themoviedb.org for {region}. Your key is in config.json.", r_tmdb_no_key: "Needs your own key in config.json (tmdb.api_key)",
+    r_tmdb_attr: "This product uses the TMDB API but is not endorsed or certified by TMDB. Where to watch data from JustWatch.",
+    sec_reco: "What's on", quick_search: "Search", quick_mylist: "My List", quick_surprise: "Surprise me", quick_gemini: "Gemini", quick_settings: "Settings",
     custom_cards: "Your cards",   // the row heading when it holds only the household's own cards (home.custom_cards)
     who_watching: "Who is watching",
     apps: "Apps",

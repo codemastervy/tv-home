@@ -6,6 +6,7 @@
 <title>Home</title>
 <link rel="preload" href="fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="reco.css">
 </head>
 <body>
 <div class="bg" id="bg" aria-hidden="true"></div>
@@ -36,7 +37,8 @@
     <div class="date" id="date"></div>
     <div class="place" id="place"></div>
     <div class="quick" id="quick">
-      <!-- the quick buttons from tvs[].quick in config.json, drawn by app.js -->
+      <div class="rclock" id="rclock"></div>
+      <!-- the quick buttons: search, My List, Surprise me, Gemini, sleep, settings; drawn by app.js -->
       <div class="qbtns" id="qbtns"></div>
       <div class="sleep-menu" id="sleep-menu"></div>
     </div>
@@ -86,6 +88,9 @@
 <!-- a short confirmation, for something that happened by itself (the weekly Developer Mode extend) -->
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<!-- the hero: what the focused app or card is about (reco.js) -->
+<div class="reco-hero" id="reco-hero" aria-live="polite"></div>
+
 <main class="home">
   <section class="shelf" id="shelf-section" aria-labelledby="shelf-title">
     <header class="shelf-head">
@@ -100,7 +105,13 @@
     <p class="hint" id="hint" aria-live="polite"></p>
     <div class="grid" id="grid"></div>
   </section>
+
+  <!-- one "What's on <app>" row per streaming app you have (reco.js) -->
+  <div id="reco-rows"></div>
 </main>
+
+<!-- Search, My List, Surprise me and the hold-OK sheet (reco.js) -->
+<div class="reco-ov" id="reco-ov" role="dialog" aria-modal="true"></div>
 
 <!-- the gear tile's menu (Home settings or TV settings), drawn by app.js -->
 <div class="gear-pop" id="gear-pop" role="menu"></div>
@@ -152,6 +163,10 @@
 
 <script src="i18n.js"></script>
 <script src="config.js"></script>
+<script src="logic.js"></script>
+<script src="demo.js"></script>
+<script src="sources.js"></script>
+<script src="reco.js"></script>
 <script src="smarthome.js"></script>
 <script src="soundscape.js"></script>
 <script src="clearicon.js"></script>

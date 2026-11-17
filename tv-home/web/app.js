@@ -56,7 +56,7 @@
   // read in readConfig() once the page starts (mock.js fills them in for previews). See docs/CONFIG.md.
   var CFG = {}, HOME = {}, TVCFG = {}, QUICK = [];
   var WXCFG = { lat: -33.8688, lon: 151.2093, place: "Sydney", timezone: "Australia/Sydney" };
-  var QUICK_ALL = ["sleep", "picture", "look", "soundscape", "screen_off", "headphones", "input", "bluetooth", "network", "tvsettings", "screensaver", "extend"];
+  var QUICK_ALL = ["search", "mylist", "surprise", "gemini", "settings", "sleep", "picture", "look", "soundscape", "screen_off", "headphones", "input", "bluetooth", "network", "tvsettings", "screensaver", "extend"];
   // The most personal photos this TV keeps (also MAX_PHOTOS in bridge/server.py and MainActivity.kt).
   var MAX_PHOTOS = 50;
   var ON_TV = false;   // served by the on-TV app (config "mode"), which can open the TV's own settings screens
@@ -254,6 +254,12 @@
     store: '<svg viewBox="0 0 24 24"><path d="M5 8h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8z"/><path d="M9 10.5V7a3 3 0 0 1 6 0v3.5"/></svg>',
     check: '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
     devmode: '<svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 3.5V8h-4.5"/></svg>',
+    // Feather icons (MIT, feathericons.com): search, My List (bookmark), Surprise me (shuffle), settings
+    search: '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>',
+    list: '<svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>',
+    shuffle: '<svg viewBox="0 0 24 24"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>',
+    settings: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+    sparkle: '<svg viewBox="0 0 24 24"><path d="M12 3c.6 4.8 3.2 7.4 8 8-4.8.6-7.4 3.2-8 8-.6-4.8-3.2-7.4-8-8 4.8-.6 7.4-3.2 8-8z"/></svg>',
     // Now playing's buttons (filled shapes)
     prev: '<svg viewBox="0 0 24 24" class="solid"><path d="M7 6h2v12H7zM20 6v12l-9-6z"/></svg>',
     next: '<svg viewBox="0 0 24 24" class="solid"><path d="M15 6h2v12h-2zM4 6v12l9-6z"/></svg>',
@@ -343,8 +349,8 @@
   document.addEventListener("touchstart", function (e) { idlePhotoInput(e); }, { capture: true, passive: false });
 
   function setPeople(list) {
-    PEOPLE = (list || []).filter(function (p) { return p && p.id && p.name; });
-    NOBODY = !PEOPLE.length;
+    PEOPLE = [];   // no profiles anywhere: one shared home
+    NOBODY = true;
     if (NOBODY) PEOPLE = [{ id: "both", name: t("everyone") }];
     PEOPLE.forEach(function (p) { if (!data.showsBy[p.id]) data.showsBy[p.id] = []; });
     if (!PEOPLE.some(function (p) { return p.id === who; })) who = PEOPLE[0].id;
@@ -385,10 +391,10 @@
     var mine = TV_ID || CFG.default_tv;
     TVCFG = (CFG.tvs || []).filter(function (t) { return t.id === mine; })[0] || (CFG.tvs || [])[0] || {};
     // no "quick" from an older bridge: the sleep timer, and the picture switch where the TV has one
-    QUICK = (Array.isArray(ST.quick) ? ST.quick : TVCFG.quick || ["sleep", "picture"])
+    QUICK = (Array.isArray(ST.quick) ? ST.quick : ["search", "mylist", "surprise", "gemini", "sleep", "settings"])
       .filter(function (q, i, a) { return QUICK_ALL.indexOf(q) >= 0 && a.indexOf(q) === i; });
     THEME = (Q.match(/[?&]theme=([a-z]+)/) || [])[1] || lookSetting();
-    if (THEME !== "classic" && THEME !== "oled") THEME = "night";
+    THEME = "night";   // the one look: couch-tv's Night look
     NIGHT = THEME === "night";
     OLED = THEME === "oled";
     document.documentElement.classList.toggle("theme-night", NIGHT);
@@ -416,7 +422,7 @@
     document.documentElement.classList.toggle("glass-icons", GLASS_ICONS);
     GLASS_AMT = glassAmount();
     CLOCK_LIQUID = (ST.clock_style || HOME.clock_style) === "liquid";
-    START_FOCUS = ["people", "apps", "keep_watching"].indexOf(ST.start_focus || HOME.start_focus) >= 0 ? (ST.start_focus || HOME.start_focus) : "people";
+    START_FOCUS = "apps";
     glassClasses();
     // a link set in Home settings wins over home.video_url; one from config.json alone means on
     VIDEO_URL = typeof ST.video_url === "string" ? ST.video_url : typeof HOME.video_url === "string" ? HOME.video_url : "";
@@ -473,7 +479,7 @@
   // no clock in Home settings or config.json: the TV's own setting, else the one usual for the language (24 hour in Italian, German, Turkish, French, Serbian, Polish and Brazilian Portuguese)
   // On the Android home the TV's own 12 or 24 hour setting (System, Date and time) comes before the language's usual clock (#221)
   function systemClock() { try { if (TV && typeof TV.is24Hour === "function") return TV.is24Hour() ? "24h" : "12h"; } catch (e) {} return ""; }
-  function clock24() { return (ST.clock || HOME.clock || systemClock() || (window.I18N ? window.I18N.clock() : "12h")) === "24h"; }
+  function clock24() { return (ST.clock || ({ "12": "12h", "24": "24h" })[HOME.clock] || systemClock() || (window.I18N ? window.I18N.clock() : "12h")) === "24h"; }
 
   // ---------------- helpers ----------------
   function esc(v) { return String(v == null ? "" : v).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
@@ -1582,6 +1588,8 @@
   document.addEventListener("webOSRelaunch", devResume);
   function quickVisible() {
     return QUICK.filter(function (q) {
+      if (q === "search" || q === "mylist" || q === "surprise" || q === "settings") return true;
+      if (q === "gemini") return window.Reco.gemini();
       if (q === "sleep") return !OFFLINE || nativeSleep();
       if (q === "picture") return !OFFLINE && picShown;
       if (q === "look") return true;
@@ -1617,7 +1625,11 @@
     var m = minutesLeft();
     vis.forEach(function (q) {
       var el = $("q-" + q);
-      if (q === "sleep") {
+      if (q === "search" || q === "mylist" || q === "surprise" || q === "gemini" || q === "settings") {
+        var ic = { search: "search", mylist: "list", surprise: "shuffle", gemini: "sparkle", settings: "settings" }[q];
+        el.innerHTML = ICONS[ic];
+        if (q === "mylist" && window.Reco && window.Reco.listItems().length) el.innerHTML = ICONS.list.replace("<svg ", '<svg class="fillish" ');
+      } else if (q === "sleep") {
         el.innerHTML = ICONS.moon + "<span>" + esc(m ? t(NIGHT ? "off_in_night" : "off_in", { m: m }) : t("sleep_timer")) + "</span>";
         el.classList.toggle("set", !!m);
       } else if (q === "picture") {
@@ -1649,6 +1661,7 @@
         el.innerHTML = ICONS.gear + "<span>" + esc(t("gear_tv")) + "</span>";
       }
     });
+    vis.forEach(function (q) { var e2 = $("q-" + q); if (e2) e2.setAttribute("data-l", t("quick_" + q)); });
     var sv = $("q-screensaver");   // an icon only look (Night) still says what it is, to the eye and to a screen reader
     if (sv) { sv.setAttribute("aria-label", t("quick_screensaver")); sv.setAttribute("title", t("quick_screensaver_sub")); }
     if (qi >= vis.length) qi = Math.max(0, vis.length - 1);
@@ -1916,7 +1929,12 @@
   }
   function quickAction() {
     var q = quickVisible()[qi];
-    if (q === "sleep") openMenu();
+    if (q === "search") Reco.openSearch();
+    else if (q === "mylist") Reco.openList();
+    else if (q === "surprise") Reco.openSurprise();
+    else if (q === "gemini") Reco.assist();
+    else if (q === "settings") openSettings();
+    else if (q === "sleep") openMenu();
     else if (q === "picture") togglePicture();
     else if (q === "look") toggleLook();
     else if (q === "soundscape") cycleSoundscape();
@@ -2794,6 +2812,7 @@
   // ---------------- focus ----------------
   function clearFocus() {
     shelfEls.concat(gridEls, quickEls).forEach(function (el) { if (el) el.classList.remove("focus"); });
+    window.Reco.clear();
     $("people").classList.remove("focus");
     Array.prototype.forEach.call($("people").children, function (el) { el.classList.remove("focus"); });
   }
@@ -2876,7 +2895,30 @@
     setTimeout(function () { el.classList.remove("hop"); }, 560);
   }
 
+  // What the home adds (reco.js): the hero follows the focus, and two zones of its own, "hero" (its
+  // buttons) and "xrow" (the What's on rows). Everything else is couch-tv's own paintFocus0.
   function paintFocus() {
+    if (zone === "reco") { clearFocus(); Reco.paint(); return; }
+    if (zone === "hero" || zone === "xrow") {
+      saveFocusSoon(); clearFocus(); renderHint(); slideDock();
+      Reco.paintFocus(zone);
+      return;
+    }
+    paintFocus0();
+    document.documentElement.classList.toggle("q-focus", zone === "quick");
+    if (zone === "grid" || zone === "shelf" || zone === "quick") {
+      if (zone === "grid" && gridItems[g] && gridItems[g].kind === "app") Reco.heroApp(gridItems[g].package, gridItems[g].name);
+      else if (zone === "shelf" && data.shows[s]) Reco.heroItem(showItem(data.shows[s]));
+      else Reco.heroDefault();
+    }
+    Reco.layout(zone);
+  }
+  function showItem(it) {
+    var pkg = it.app && it.app["package"], p = window.Logic.platformOfPkg(pkg || "");
+    var ep = it.season && it.episode ? "S" + it.season + " E" + it.episode : (it.episode_title || "");
+    return { title: it.title, sub: ep, art: it.backdrop || it.poster || "", pkg: pkg, platform: p ? p.id : "", wn: it.id, genres: it.genres || [], source: "watchnext" };
+  }
+  function paintFocus0() {
     if (DOCK_MAC) setTimeout(magnify, 0);   // after this paint has put the focus class where it belongs
     saveFocusSoon();
     if (zone === "settings") { renderSettings(); return; }
@@ -2980,6 +3022,7 @@
       renderAmbientControls();
       return;
     }
+    if (recoNav(dx, dy)) return;
     // Night with More apps open: the cards step aside, so up and down skip them
     var cards = NIGHT && expanded ? [] : shelfEls;
     if (zone === "menu") {
@@ -3093,6 +3136,54 @@
     paintFocus();
   }
 
+  // Focus order: round buttons (top right), hero, apps, Continue watching, then the What's on rows.
+  function centreX(el) { var b = el.getBoundingClientRect(); return b.left + b.width / 2; }
+  function recoNav(dx, dy) {
+    var rowsOn = Reco.rowCount() > 0, kw = shelfEls.length > 0 && shelfOn() && !expanded;
+    if (zone === "reco") { Reco.move(dx, dy); return true; }
+    if (zone === "quick") {
+      if (dx) qi = Math.max(0, Math.min(quickVisible().length - 1, qi + dx));
+      else if (dy > 0) { zone = "hero"; Reco.heroReset(); }
+      paintFocus(); return true;
+    }
+    if (zone === "hero") {
+      if (dx) Reco.heroStep(dx);
+      else if (dy < 0 && hasQuick()) { zone = "quick"; qi = Math.max(0, quickVisible().length - 1); }
+      else if (dy > 0 && gridEls.length) { zone = "grid"; g = Math.max(0, Math.min(g, gridEls.length - 1)); }
+      paintFocus(); return true;
+    }
+    if (zone === "grid" && !expanded && dy) {
+      var gx = gridEls[g] ? centreX(gridEls[g]) : 0;
+      if (dy < 0) { zone = "hero"; Reco.heroReset(); }
+      else if (kw) { zone = "shelf"; s = nearestIn(shelfEls, gx); }
+      else if (rowsOn) { zone = "xrow"; Reco.at(0, gx); }
+      else return true;
+      paintFocus(); return true;
+    }
+    if (zone === "shelf" && !expanded && dy) {
+      var sx = shelfEls[s] ? centreX(shelfEls[s]) : 0;
+      if (dy < 0) { zone = "grid"; g = nearestInRow(0, sx); }
+      else if (rowsOn) { zone = "xrow"; Reco.at(0, sx); }
+      else return true;
+      paintFocus(); return true;
+    }
+    if (zone === "xrow") {
+      var cx = 0;
+      if (Reco.rowMove(dx, dy) === "up") {
+        var cur = Reco.currentEl();
+        cx = cur ? centreX(cur) : 0;
+        if (kw) { zone = "shelf"; s = nearestIn(shelfEls, cx); } else { zone = "grid"; g = nearestInRow(0, cx); }
+      }
+      paintFocus(); return true;
+    }
+    return false;
+  }
+  function nearestIn(els, x) {
+    var best = 0, bd = Infinity;
+    els.forEach(function (el, i) { var d = Math.abs(centreX(el) - x); if (d < bd) { bd = d; best = i; } });
+    return best;
+  }
+
   // ---------------- going round at the ends ----------------
   // A single press of an arrow at the end of a row or a list goes round to the other end: left on the
   // first app lands on More apps, down on the last row of a Home settings list lands on its first row.
@@ -3105,14 +3196,14 @@
   function arrowAgain(p, dir, now, repeat) { return !!(repeat || (p && p.dir === dir && now - p.last < 1000)); }
   function navState() {
     return [zone, g, s, pi, qi, npI, menuI, pmi, gi, amI, smI, ai, inI, ambI, expanded, !!lift, plift,
-      SET.col, SET.sec, SET.ri, !!SET.lift, !!SET.sub].join("|");
+      SET.col, SET.sec, SET.ri, !!SET.lift, !!SET.sub, Reco.hi, Reco.xr, Reco.xi].join("|");
   }
   // where a list of n entries goes round to: forwards to the first, backwards to the last
   function wrapIndex(n, d) { return d > 0 ? 0 : Math.max(0, n - 1); }
   function wrapRound(dx, dy) {
     if (document.documentElement.dir === "rtl") dx = -dx;
     if (lift || plift || SET.lift) return;   // carrying something: the ends stay the ends
-    if (zone === "smart" || zone === "ambient") return;   // they keep their own focus
+    if (zone === "smart" || zone === "ambient" || zone === "reco" || zone === "hero" || zone === "xrow") return;   // they keep their own focus
     var d = dy || dx;
     if (zone === "settings") {
       if (!dy) return;   // left and right change a value or the column
@@ -3211,6 +3302,8 @@
       toggleScreenOff(false);
       return;
     }
+    if (zone === "reco") { Reco.back(); return; }
+    if (zone === "hero" || zone === "xrow") { zone = "grid"; g = 0; paintFocus(); return; }
     if (kidsOn()) { window.KidsMode.home(); return; }
     if (zone === "ambient") {
       ambientDismissed = true;
@@ -3249,6 +3342,14 @@
   // there is nothing to pick up here, and then the press counts as a normal OK.
   function hold() {
     touched = true;
+    if (zone === "reco") return Reco.hold();
+    if (zone === "hero") return Reco.heroHold();
+    if (zone === "xrow") return Reco.holdRow();
+    if (zone === "shelf" && data.shows[s]) {
+      var sh = data.shows[s];
+      Reco.sheet(showItem(sh), [{ id: "dismiss", label: t("r_remove_cw"), run: function () { dismissShow(sh); } }]);
+      return true;
+    }
     if (zone === "settings") return setHold();
     if (zone === "gear" || zone === "smart" || zone === "updask" || zone === "inputs" || zone === "shelfmenu") return false;
     if (lift) { dropLift(); return true; }
@@ -3264,6 +3365,9 @@
 
   function activate() {
     touched = true;
+    if (zone === "reco") { Reco.ok(); return; }
+    if (zone === "hero") { Reco.heroOk(); paintFocus(); return; }
+    if (zone === "xrow") { Reco.openCurrent(); return; }
     if (zone === "settings") { setActivate(); return; }
     if (zone === "smart") { window.smartHome.ok(); return; }
     if (zone === "gear") { if (gi === 0) openSettings(); else openTvSettings(); return; }
@@ -3400,8 +3504,8 @@
   // Saved on this TV (page storage and the launcher's own store, TVOS.keep) and, with a bridge,
   // also on the computer (/api/settings), so the phone and the TV agree.
   var ST_KEY = "tvhome.settings";
-  var SECS = [["language", "globe"], ["location", "pin"], ["weather", "cloud"], ["look", "look"],
-    ["apps", "apps"], ["picks", "apps"], ["people", "person"], ["quick", "bolt"], ["about", "info"]];
+  var SECS = [["reco", "bolt"], ["language", "globe"], ["location", "pin"], ["weather", "cloud"], ["look", "look"],
+    ["apps", "apps"], ["picks", "apps"], ["quick", "bolt"], ["about", "info"]];
   var SET = { col: "secs", sec: 0, ri: 0, keyFocus: null, sub: null, lift: null, confirm: null, dirty: false, typing: null,
     msg: "", geo: { q: "", list: null, busy: false, err: false } };
   var REPO_URL = "github.com/Seagey/couch-tv";
@@ -3478,6 +3582,7 @@
     document.documentElement.classList.remove("setting");
     zone = "grid";
     if (window.AmbientWeather) window.AmbientWeather.resume();
+    Reco.apply(); recoSig = "";
     if (SET.dirty) { SET.dirty = false; restart(); return; }
     paintFocus();
     resetIdlePhoto();
@@ -3522,9 +3627,32 @@
     if (id === "look") return lookRows();
     if (id === "apps") return appsRows();
     if (id === "picks") return picksRows();
-    if (id === "people") return peopleRows();
+    if (id === "reco") return recoRows();
     if (id === "quick") return quickRows();
     return aboutRows();
+  }
+
+  // ---- What's on: the wallpaper, Gemini, one row per streaming app, TMDB
+  function recoRows() {
+    var c = Reco.cfg(), rows = [head(t("r_head")), info("reco-sub", t("r_sub"))];
+    rows.push({ kind: "check", key: "r:wall", label: t("r_wallpaper"), sub: t("r_wallpaper_sub"), checked: c.home.wallpaper,
+      act: function () { ST.wallpaper = !c.home.wallpaper; saveSettings(); Reco.apply(); } });
+    rows.push({ kind: "check", key: "r:gem", label: t("r_gemini"), sub: t("r_gemini_sub"), checked: c.home.gemini,
+      act: function () { ST.gemini = !c.home.gemini; saveSettings(); renderQuick(); } });
+    rows.push(head(t("r_platforms")));
+    var ps = Reco.platforms();
+    if (!ps.length) rows.push(info("r:none", t("r_no_platforms")));
+    ps.forEach(function (p) {
+      var on = window.Logic.rowOn(c, p);
+      rows.push({ kind: "check", key: "r:p:" + p.id, label: t("r_whats_on", { app: p.name }), checked: on,
+        act: function () { var m = Object.assign({}, ST.platform_rows || c.home.platform_rows); m[p.id] = !on; ST.platform_rows = m; saveSettings(); } });
+    });
+    rows.push(head(t("r_tmdb")));
+    var keyed = !!c.tmdb.api_key;
+    rows.push({ kind: "check", key: "r:tmdb", label: t("r_tmdb_use"), sub: keyed ? t("r_tmdb_key_set", { region: c.tmdb.region }) : t("r_tmdb_no_key"), checked: c.tmdb.enabled && keyed,
+      act: function () { ST.tmdb_enabled = !(c.tmdb.enabled && keyed); saveSettings(); } });
+    rows.push(info("r:attr", t("r_tmdb_attr")));
+    return rows;
   }
 
   function languageRows() {
@@ -4555,7 +4683,7 @@
 
   // Focus is never lost: after any key, if nothing shows focus, the first dock app gets it.
   function ensureFocus() {
-    if (document.querySelector(".focus")) return;
+    if (document.querySelector(".focus") || zone === "reco") return;
     zone = "grid"; g = 0;
     paintFocus();
   }
@@ -4803,6 +4931,7 @@
     }
     if (kidsOn()) { okReset(); if (window.KidsMode.key(e)) e.preventDefault(); return; }
     if (idlePhotoInput(e)) return;
+    if (zone === "reco" && Reco.key(e)) { e.preventDefault(); return; }   // typing in Search
     if (typingKey(e)) return;   // typing a place or a name: the keys belong to the text box
     if (isOk(e)) {
       e.preventDefault();
@@ -4889,11 +5018,34 @@
       .sort(function (a, b) { return rank(a.package) - rank(b.package) || a.name.localeCompare(b.name); });
   }
 
+  // reco.js reads what the apps published (and TMDB, when it is switched on) once the apps are known
+  var recoSig = "", recoTimer = 0;
+  function recoInit() {
+    window.Reco.init({
+      t: t, esc: esc, TV: TV, icon: function (n) { return ICONS[n] || ""; },
+      st: function () { return ST; }, keep: keep, kept: kept,
+      is24: function () { return CLOCK24; }, locale: function () { return window.I18N ? window.I18N.locale() : "en-NZ"; },
+      packages: function () { return shownApps().filter(function (a) { return a.kind === "app"; }).map(function (a) { return a.package; }); },
+      shows: function () { return data.shows; },
+      zone: function () { return zone; }, setZone: function (z) { zone = z; }, repaint: function () { paintFocus(); },
+      iconUrl: iconUrl, launch: function (pkg) { return !!(TV && TV.launch && TV.launch(pkg)); }, toast: toast
+    });
+    setInterval(function () { recoSig = ""; recoSoon(); }, 10 * 60000);
+    window.__home = { state: function () { var o = window.Reco.state(); o.zone = zone; o.g = g; o.s = s; o.qi = qi; o.focus = (document.querySelector(".focus") || {}).textContent || ""; return o; } };   // read by the emulator tests
+  }
+  function recoSoon() {
+    var sig = shownApps().map(function (a) { return a.package; }).join(",") + "|" + data.shows.length;
+    if (sig === recoSig) return;
+    recoSig = sig;
+    clearTimeout(recoTimer);
+    recoTimer = setTimeout(function () { Reco.refresh(); }, 60);
+  }
   function render() {
     renderShelf();
     renderGrid();
     if (!touched && zone !== "updask" && !restoreFocus()) startFocus();
     paintFocus();
+    recoSoon();
     kidSync();
     if (kidsOn()) window.KidsMode.rerender();
   }
@@ -5047,6 +5199,7 @@
 
   function start() {
     readConfig();
+    recoInit();
     kidsInit();
     kidSync();   // a kids profile on the couch: its shelf before anything else shows
     staticText();
