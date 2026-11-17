@@ -1,60 +1,63 @@
-# TV home (personal fork)
+# TV home
 
-> Fork of [Seagey/couch-tv](https://github.com/Seagey/couch-tv). MIT, with the original copyright kept in [LICENSE](LICENSE).
+Based on [couch-tv](https://github.com/Seagey/couch-tv) by Seagey (MIT), substantially reworked.
 
-A replacement home screen for an Android / Google TV: a scene behind a big clock, a row of your apps, a shelf
-of "keep watching" items and your own picks, and a weather line. It runs on the TV alone. Nothing here talks to
-a phone, a bridge or an AI.
+My own home screen for an Android / Google TV. I wanted Google TV's layout (search, clock, a big banner, rows of
+things to watch) without Google's ads, and with rows that are actually about the streaming apps I pay for.
 
-![The home](docs/screens/home.png)
+![Wallpaper home](docs/screens/home-wallpaper.png)
 
 ## What it does
-- Shows the apps you choose, in the order you choose, over a rotating scene (or an OLED-black or classic grid look).
-- **Keep watching:** reads Android's own Watch Next list, the same data Google's "Continue watching" row uses. Google's
-  recommendation banner is not available to a replacement home, so it is not shown.
-- **Own picks:** a shelf of cards you choose, in a random order every time the home opens. They come from your list, not from ads.
-- Weather and clock. No ads: a test fails if the home ever references a host outside a short allowlist.
+- **Two looks, one home.** Full-screen wallpaper (the default), or a recommendations banner like Google TV's.
+  The switch is in Settings and changes only the top area: the bars, rows, search and focus order are identical.
+- **Top bar:** Search, My List and Surprise me on the left; a Gemini button, Settings and the clock on the right.
+- **Apps row**, then **Continue watching** (Android's Watch Next list), then one **What's on ...** row per streaming
+  app I have set up, in the same order as the apps row. Each row has its own switch in Settings.
+- **Focus an app and the banner becomes that app's.** Its own published recommendations, not a guess.
+- **Search** with typing and genre / mood sections (Comedy, Feel-good, ...). Only my platforms, rent and buy
+  options included. Titles open in the app, with a deep link when the app published one.
+- **My List** (saved on the TV; hold OK on any title to add or remove it), **Surprise me**, and my own picks row.
+- **No ads, no sponsored tiles, no accounts, no AI in the app.** The Gemini button hands off to the TV's own assistant.
 
-![Own picks shelf](docs/screens/home-picks.png)
+![Banner look](docs/screens/home-banner.png)
+![Focus on an app](docs/screens/app-banner.png)
+![A platform row](docs/screens/platform-row.png)
+![Search by genre](docs/screens/search.png)
+![Settings](docs/screens/settings.png)
+![My List](docs/screens/my-list.png)
 
-## What is different from upstream
-Removed: the phone remote and web app, the bridge server, QR/pairing, the Claude assistant, the other TV brands
-and Apple TV/Roku/Samsung/LG code, network discovery and the CI workflow. Added: `home.picks` and the Own picks
-screen, `home.app_order`, an interactive setup, a no-ads test and emulator tests. Self-update is off. Details are in
-[CHANGELOG.md](CHANGELOG.md) and [docs/TRACK-A.md](docs/TRACK-A.md). Remote control of the TV is handled elsewhere (Home Assistant).
+The pictures use invented sample titles and generated art, not real posters.
+
+## Where the recommendations come from
+1. **What the apps publish to the TV** (Android TV preview channels and Watch Next). It needs no key and no account,
+   and it is personalised by each app. How much an app publishes is up to the app: [docs/RECOMMENDATIONS.md](docs/RECOMMENDATIONS.md).
+2. **TMDB, optional and off by default.** With my own free API key it fills out the platform rows and search for the
+   apps I have, in my country (`NZ`), including rent / buy, and ranks them by the genres in My List and Continue watching.
+   The key lives in `config.json`, which git ignores.
+
+Google's own home banner is not available to another home app, so this one never shows it.
+
+*This product uses the TMDB API but is not endorsed or certified by TMDB. Streaming availability data is provided by JustWatch via TMDB.*
 
 ## Set it up
-Two ways, same choices: `./setup.sh` (questions in a terminal, writes a git-ignored `config.json`) or the TV's own
-Home settings screen, with the D-pad only. Full steps, for a person or an AI agent: [SETUP.md](SETUP.md).
-
-| On the TV | |
-|---|---|
-| ![Look and scenes](docs/screens/setup-look.png) | ![Own picks](docs/screens/setup-picks.png) |
+`./setup.sh` asks one question at a time (wallpaper or banner, apps, which platform rows, TMDB, Gemini button, clock,
+picks, weather) and writes `config.json`. The Settings screen on the TV changes the same things with the D-pad.
+Details for a person or an AI agent: [SETUP.md](SETUP.md). Every setting: [docs/CONFIG.md](docs/CONFIG.md).
 
 ## Build and install
-Needs JDK 21 and the Android SDK (platform 34, build-tools 34).
+JDK 21 and the Android SDK (platform 34, build-tools 34):
 ```sh
-sh scripts/build-apk.sh                    # APK in dist/, config.json is used if present, otherwise config.example.json
+sh scripts/build-apk.sh                    # APK in dist/, uses config.json if present
 sh tv-home/tools/install.sh emulator-5554  # one adb device; refuses anything but an emulator unless I_MEAN_A_REAL_TV=yes
 ```
-The first run asks whether to make it the home screen; "Not now" keeps it as a normal app.
 
-## Tests
-```sh
-for f in tests/*.js; do node $f; done; python3 -I tests/test_setup.py; sh tests/test_no_ads.sh
-# Android TV emulator (API 34), a debug build installed, python with `websockets`:
-sh tests/emulator/run_all.sh <python>      # focus order, Watch Next, picks row, the setup screen
-```
-The emulator tests only ever talk to `emulator-5554`.
-
-## Limits: what is only proven on the emulator
-Everything above. Not tried on a real TV: taking over from the maker's home with the Home key, any ad row the TV
-maker adds, which apps publish Watch Next entries, and how focus feels with a real remote. The TV's setup screen
-saves on the TV; it can't write `config.json` back.
+## Status and limits
+Built and checked on the Android TV emulator only; I have not run it on my own TV yet. What a particular app
+publishes, how the Home button hands over from the TV's own home, and how the remote feels are all untested on real hardware.
 
 ## Undo
-Uninstall the app (`adb uninstall app.couchtv.launcher`) or from the TV's app settings. The maker's own home was never
-disabled. If the TV ever shows the wrong home, press Home and choose the TV's own.
+Uninstall it (`adb uninstall app.couchtv.launcher`). The TV's own home was never disabled.
 
 ## Credit
-Original project and design: Seagey/couch-tv (MIT). Scene photos and fonts keep their own credits in `tv-home/web/backgrounds/CREDITS.md`.
+Original project and design: Seagey/couch-tv (MIT, copyright kept in [LICENSE](LICENSE)). Wallpaper photos and fonts keep their
+credits in `tv-home/web/backgrounds/CREDITS.md`.

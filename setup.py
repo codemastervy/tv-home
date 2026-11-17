@@ -8,7 +8,6 @@ ever run as a command. Scripted use: pipe the answers in, one per line (see test
 import json, os, re, sys
 from zoneinfo import ZoneInfo
 
-LOOKS = {"1": "night", "2": "oled", "3": "classic"}
 SCENES = ["night", "golden", "water", "fog", "dawn"]
 # Fixed table: the name you type -> Android package. Anything else must look like a package name.
 APPS = {
@@ -32,18 +31,23 @@ def ask(q, default=None):
     return a or (default or "")
 
 
-def pick_look():
+def yes(q, default="yes"):
     while True:
-        a = ask("1/5 Look. 1 = night (scenes + big clock), 2 = oled (apps on pure black), 3 = classic grid", "1").lower()
-        a = LOOKS.get(a, a)
-        if a in LOOKS.values():
-            return a
-        print("  Please answer 1, 2 or 3.")
+        a = ask(q + " (yes/no)", default).lower()
+        if a in ("yes", "y"):
+            return True
+        if a in ("no", "n"):
+            return False
+        print("  Please answer yes or no.")
+
+
+def pick_wallpaper():
+    return yes("1 Wallpaper: a full-screen scene behind the home? (no = a recommendations banner instead)")
 
 
 def pick_scenes():
     while True:
-        a = ask("2/5 Scenes, in the order they take turns. Choose from: " + ", ".join(SCENES) +
+        a = ask("2 Scenes, in the order they take turns. Choose from: " + ", ".join(SCENES) +
                 ". Comma separated, blank = all", "")
         names = [x.strip().lower() for x in a.split(",") if x.strip()] or list(SCENES)
         bad = [n for n in names if n not in SCENES]
@@ -53,7 +57,7 @@ def pick_scenes():
 
 
 def pick_apps():
-    print("\n3/5 Apps, first = first on the home. Names I know: " + ", ".join(APPS) +
+    print("\n3 Apps, first = first on the home. Names I know: " + ", ".join(APPS) +
           ".\n    Or type an Android package name (like com.example.app). Comma separated.")
     while True:
         a = ask("Your apps, in order (blank = leave the default order)", "")
@@ -66,8 +70,57 @@ def pick_apps():
         print("  Not an app name or package:", ", ".join(bad))
 
 
+# package -> platform id, for the per-platform "What's on ..." rows
+PLATFORMS = {"com.netflix.ninja": "netflix", "com.disney.disneyplus": "disney",
+             "com.amazon.amazonvideo.livingroom": "prime", "com.apple.atve.androidtv.appletv": "appletv",
+             "com.google.android.youtube.tv": "youtube"}
+NAMES = {"netflix": "Netflix", "disney": "Disney+", "prime": "Prime Video", "appletv": "Apple TV", "youtube": "YouTube"}
+KEY = re.compile(r"^[A-Za-z0-9]{16,64}$")
+REGION = re.compile(r"^[A-Z]{2}$")
+
+
+def pick_platform_rows(apps):
+    rows = {}
+    for pkg in apps:
+        pid = PLATFORMS.get(pkg)
+        if pid:
+            rows[pid] = yes(f"4 Show a \"What's on {NAMES[pid]}\" row (that app's own recommendations)?")
+    return rows
+
+
+def pick_tmdb():
+    print("\n5 TMDB (optional, off by default): adds suggestions and search results from themoviedb.org for your apps only,"
+          "\n  including rent/buy. Needs your own free API key; it goes in config.json, which git ignores.")
+    if not yes("Turn TMDB on?", "no"):
+        return {"enabled": False, "api_key": "", "region": "NZ"}
+    while True:
+        region = ask("  Country code for what is available to you", "NZ").upper()
+        if REGION.match(region):
+            break
+        print("  Two letters, like NZ.")
+    while True:
+        key = ask("  Your TMDB v3 API key (blank = I will add it to config.json later)", "")
+        if not key or KEY.match(key):
+            break
+        print("  That does not look like a v3 API key (16-64 letters and digits).")
+    return {"enabled": True, "api_key": key, "region": region}
+
+
+def pick_gemini():
+    return yes("6 Gemini button in the top bar (opens the TV's own assistant; this app has no AI)?")
+
+
+def pick_clock():
+    while True:
+        a = ask("7 Clock: system (follow the TV), 12 or 24 hour", "system").lower()
+        if a in ("system", "12", "24"):
+            break
+        print("  Answer system, 12 or 24.")
+    return a, yes("  Show the date under the clock?")
+
+
 def pick_picks():
-    print(f"\n4/5 Your own picks: cards shown in a random order (up to {MAX_PICKS}). Leave the name blank to finish.")
+    print(f"\n8 Your own picks: cards shown in a random order (up to {MAX_PICKS}). Leave the name blank to finish.")
     out = []
     while len(out) < MAX_PICKS:
         title = ask(f"Pick {len(out) + 1} name (blank = done)", "")
@@ -96,7 +149,7 @@ def pick_picks():
 
 
 def pick_weather():
-    place = ask("5/5 Weather place name (blank = no weather on the home)", "")
+    place = ask("9 Weather place name (blank = no weather on the home)", "")
     if not place:
         return None
     place = re.sub(r"[\x00-\x1f\x7f]+", " ", place).strip()[:60]
@@ -117,10 +170,17 @@ def pick_weather():
 
 
 def build():
-    look, scenes, apps, picks, weather = pick_look(), pick_scenes(), pick_apps(), pick_picks(), pick_weather()
-    cfg = {"people": [{"id": "home", "name": "Home"}],
-           "home": {"look": look, "scenes": scenes, "scene_seconds": 20, "dock_size": 10, "sun_sync": False,
-                    "hide_packages": [], "app_order": apps, "picks": picks}}
+    wall = pick_wallpaper()
+    scenes = pick_scenes() if wall else list(SCENES)
+    apps = pick_apps()
+    rows = pick_platform_rows(apps)
+    tmdb = pick_tmdb()
+    gemini = pick_gemini()
+    clock, date = pick_clock()
+    picks, weather = pick_picks(), pick_weather()
+    cfg = {"home": {"wallpaper": wall, "scenes": scenes, "scene_seconds": 20, "app_order": apps,
+                    "platform_rows": rows, "gemini": gemini, "clock": clock, "show_date": date, "picks": picks},
+           "tmdb": tmdb}
     if weather:
         cfg["weather"] = weather
     return cfg

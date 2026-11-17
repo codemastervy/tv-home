@@ -1,13 +1,24 @@
 {
-  "people": [{ "id": "home", "name": "Home" }],
   "home": {
-    "look": "night",
-    "scenes": ["night", "golden", "water", "fog", "dawn"],
+    "wallpaper": true,
+    "scenes": [
+      "night",
+      "golden",
+      "water",
+      "fog",
+      "dawn"
+    ],
     "scene_seconds": 20,
-    "dock_size": 10,
-    "sun_sync": false,
-    "hide_packages": [],
     "app_order": [],
+    "platform_rows": {},
+    "gemini": true,
+    "clock": "system",
+    "show_date": true,
     "picks": []
+  },
+  "tmdb": {
+    "enabled": false,
+    "api_key": "",
+    "region": "NZ"
   }
 }

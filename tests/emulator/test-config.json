@@ -1,17 +1,16 @@
 {
-  "people": [{ "id": "home", "name": "Home" }],
+  "demo": true,
   "home": {
-    "look": "night",
-    "scenes": ["night", "golden"],
-    "dock_size": 10,
-    "sun_sync": false,
-    "hide_packages": [],
-    "app_order": ["com.google.android.youtube.tv"],
-    "picks": [
-      { "title": "Test pick 1", "subtitle": "a", "app": "com.google.android.youtube.tv" },
-      { "title": "Test pick 2", "subtitle": "b", "app": "com.netflix.ninja" },
-      { "title": "Test pick 3", "subtitle": "c", "url": "https://example.com" }
-    ]
+    "wallpaper": true,
+    "scenes": ["night", "golden", "water"],
+    "scene_seconds": 600,
+    "app_order": ["com.netflix.ninja", "com.disney.disneyplus", "com.amazon.amazonvideo.livingroom", "com.apple.atve.androidtv.appletv", "com.google.android.youtube.tv"],
+    "platform_rows": {},
+    "gemini": true,
+    "clock": "12",
+    "show_date": true,
+    "picks": []
   },
-  "weather": { "lat": -41.29, "lon": 174.78, "place": "Testville", "timezone": "Pacific/Auckland" }
+  "tmdb": { "enabled": true, "api_key": "0123456789abcdef0123456789abcdef", "region": "NZ" },
+  "weather": { "lat": -41.29, "lon": 174.78, "place": "Wellington", "timezone": "Pacific/Auckland" }
 }
