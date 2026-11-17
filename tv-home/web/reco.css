@@ -5,7 +5,7 @@
 .home { transform: translateY(var(--vy, 0rem)); transition: transform 320ms var(--ease); }
 .reco.theme-night .apps { top: 33rem; bottom: auto; }
 .reco.theme-night .shelf { top: 46rem; }
-.reco.scrolled .apps, .reco.scrolled .shelf { opacity: 0; pointer-events: none; }
+.reco.scrolled .apps, .reco.scrolled2 .shelf { opacity: 0; pointer-events: none; }
 .reco.expanded .reco-hero, .reco.expanded #reco-rows { display: none; }
 #reco-rows { position: absolute; left: var(--safe-x); right: var(--safe-x); top: 59.5rem; }
 .xrow { height: 13.75rem; transition: opacity 240ms var(--ease); }

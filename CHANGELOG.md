@@ -1,9 +1,14 @@
-# Changelog (fork of Seagey/couch-tv, MIT)
+# Changelog (based on Seagey/couch-tv, MIT)
 
 Upstream is the `upstream` git remote. Pull updates with `git fetch upstream`.
 This fork is the guest/rental TV home only (couch-tv option A): no phone remote, no bridge.
 
 ## Unreleased
+- The home is couch-tv's own Night look again (the earlier rewrite is gone). Added on top, in the same glass style: search,
+  My List, Surprise me, Gemini (hands over to the TV's assistant) and Settings as round buttons; a small clock; a hero that
+  follows the focused app; Continue watching; one "What's on <app>" row per streaming app you have (from what the app
+  publishes to the TV, plus TMDB if you switch it on). Wallpaper off swaps the scenes for a banner, nothing else changes.
+- No profiles anywhere. Sample-data mode (`demo`) for screenshots and tests. New emulator tests: tests/emulator/reco.py.
 - Removed: bridge/, remote/ (phone web UI), on-tv/, standalone/, sync/, other TV brands
   (lg, samsung, roku, tvos, vega, titan), their scripts, docs and tests, and the CI workflow.
   This also removes the Claude assistant (`claude -p`): no AI at runtime.

@@ -229,7 +229,8 @@
     home.style.setProperty("--vy", vy + "rem");
     // rows that have moved up under the hero fade out
     rows.forEach(function (r, i) { if (r.el) r.el.style.opacity = top + i * 13.75 + vy < 31 ? "0" : ""; });
-    document.documentElement.classList.toggle("scrolled", vy < -8);
+    document.documentElement.classList.toggle("scrolled", vy < 0);
+    document.documentElement.classList.toggle("scrolled2", vy < -8);
   };
 
   // ---------------------------------------------------------------- open, My List, assistant
