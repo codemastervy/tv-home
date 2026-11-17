@@ -3,8 +3,8 @@
 
 /* ---------- layout: hero, apps, Continue watching, then the rows ---------- */
 .home { transform: translateY(var(--vy, 0rem)); transition: transform 320ms var(--ease); }
-.reco.theme-night .apps { top: 33rem; bottom: auto; }
-.reco.theme-night .shelf { top: 46rem; }
+.reco.theme-night .apps { top: 34rem; bottom: auto; }
+.reco.theme-night .shelf { top: 46.5rem; }
 .reco.scrolled .apps, .reco.scrolled2 .shelf { opacity: 0; pointer-events: none; }
 .reco.expanded .reco-hero, .reco.expanded #reco-rows { display: none; }
 #reco-rows { position: absolute; left: var(--safe-x); right: var(--safe-x); top: 59.5rem; }
@@ -24,6 +24,9 @@
 .rclock b { font-size: 2.125rem; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
 .rclock span { font-size: 1.375rem; color: rgba(255, 255, 255, 0.78); }
 .q-focus .rclock { opacity: 0; }
+/* wallpaper on: couch-tv's own big clock and date are the clock; the small one is for banner mode only */
+.rclock { display: none; }
+.no-wall .rclock { display: flex; }
 .qbtn { position: relative; }
 .qbtn.focus[data-l]::after {
   content: attr(data-l); position: absolute; top: calc(100% + 0.75rem); right: 0; white-space: nowrap; z-index: 3;
@@ -64,7 +67,7 @@ html.no-wall { background: radial-gradient(120% 90% at 20% 0%, #2b2437 0%, #1713
 .no-wall .rh-body { position: relative; z-index: 1; width: 62rem; padding: 1.5rem 2.75rem; }
 .no-wall .rh-title { font-size: 2.75rem; line-height: 3.125rem; }
 .no-wall .rh-sub { font-size: 1.5rem; }
-.no-wall .rh-desc { font-size: 1.3125rem; line-height: 1.75rem; max-width: 46rem; }
+.no-wall .rh-desc { font-size: 1.3125rem; line-height: 1.75rem; max-width: 52rem; }
 
 /* ---------- full screens: Search, My List, Surprise me, the sheet ---------- */
 .reco-ov { display: none; position: fixed; inset: 0; z-index: 40; padding: 4rem var(--safe-x); background: rgba(12, 10, 16, 0.985); color: #fff; }
@@ -92,7 +95,7 @@ html.no-wall { background: radial-gradient(120% 90% at 20% 0%, #2b2437 0%, #1713
 .rchip { display: flex; justify-content: center; align-items: center; height: 3.75rem; padding: 0 0.5rem; border-radius: 1.875rem; font-size: 1.375rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: rgba(255, 255, 255, 0.1); transition: transform 200ms var(--ease), background 200ms var(--ease); }
 .rchip.on { background: rgba(255, 255, 255, 0.3); box-shadow: inset 0 0 0 0.125rem rgba(255, 255, 255, 0.6); }
 .rchip.focus { background: #fff; color: #111; transform: scale(1.05); }
-.r-res { height: 34.5rem; overflow: hidden; padding: 1rem; margin: -1rem; }
+.r-res { height: 38rem; overflow: hidden; padding: 1rem; margin: -1rem; }
 .r-res.big { height: 46rem; margin-top: 1rem; }
 .r-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; position: relative; }
 .r-grid.cols3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }

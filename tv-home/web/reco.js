@@ -219,7 +219,7 @@
     var home = document.querySelector(".home"), box = $("reco-rows");
     if (!home || !box) return;
     var kw = !document.getElementById("shelf-section").classList.contains("empty");
-    var top = kw ? 59.5 : 46.5;
+    var top = kw ? 59.5 : 47.5;
     box.style.top = top + "rem";
     var vy = 0, z = zone || C.zone();
     if (z === "xrow") {

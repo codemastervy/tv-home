@@ -58,16 +58,13 @@ async def main():
         if "Yes, show me" in first:
             key("DPAD_DOWN"); key("DPAD_CENTER"); time.sleep(1)
         shot("home")
-        for _ in range(6):                      # walk the apps row to the Settings tile
-            if "Settings" in await ev(txt(".focus")):
+        # the dock has no gear tile: Settings is the top-right button, reached with Up from the dock
+        assert not await ev("document.querySelector('#grid .face.tool svg path[d^=\"M19.4 15\"]')"), "the dock still has a gear tile"
+        for _ in range(3):
+            if await ev("(document.querySelector('.qbtn.focus')||{}).id || ''") == "q-settings":
                 break
-            key("DPAD_RIGHT")
-        assert "Settings" in await ev(txt(".focus")), "never reached the Settings tile"
-        for _ in range(3):                      # OK on the gear opens a two-item menu (the first OK may only show a hint)
-            key("DPAD_CENTER"); time.sleep(0.8)
-            if "Home settings" in await ev(txt(".focus")):
-                break
-        assert "Home settings" in await ev(txt(".focus")), "gear menu did not open"
+            key("DPAD_UP")
+        assert await ev("(document.querySelector('.qbtn.focus')||{}).id || ''") == "q-settings", "never reached the top-right Settings button"
         key("DPAD_CENTER"); time.sleep(1)
         assert await ev("document.getElementById('settings').classList.contains('on')"), "setup screen did not open"
         key("DPAD_LEFT")                        # make sure the section list (left column) has focus

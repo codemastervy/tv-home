@@ -32,20 +32,46 @@
   };
   var PKG = {};
   if (root.Logic) root.Logic.PLATFORMS.forEach(function (p) { PKG[p.id] = p.pkg; });
-  var DESC = "A short invented description for the sample data, so the banner has a line of text to show under the title.";
+  var DESCS = {
+    "Harbour Lights": "A ferry pilot and a retired lighthouse keeper uncover why the harbour lamps keep going dark at night.",
+    "The Long Orbit": "A repair crew drifting between stations finds a signal that should have gone silent decades ago.",
+    "Salt and Ember": "Two rival chefs on a fishing island reopen the old smokehouse and a very old family dispute.",
+    "Nine Lives of Mo": "A stray cat with a gift for bad timing keeps landing on his feet in a very small town.",
+    "Quiet Season": "When winter closes the mountain road, a village notices one of its neighbours never came back.",
+    "Paper Kingdoms": "A girl folds a map into a boat and sails it into a land made entirely of paper.",
+    "Little Comet": "A small comet loses its tail and has one night to find its way back to the sky.",
+    "Rangers of Ember Hill": "The junior rangers of a hillside park take on floods, foxes and one very grumpy mayor.",
+    "The Lantern Keeper": "An apprentice inherits a lantern that lights the way to places no one has charted.",
+    "Deep Blue Diaries": "Divers and scientists follow a year in the life of a reef most people will never see.",
+    "Captain Pip": "A cheerful ship's cook is mistaken for the captain and decides to play along.",
+    "Night Shift Detectives": "Two detectives work the hours nobody wants and solve the cases that only happen after midnight.",
+    "Second Wind": "A retired runner coaches a school team and finds he is the one who needed the training.",
+    "Last Train North": "A night train, nine strangers and a missing briefcase. Everyone has a reason to lie.",
+    "Blue Mile": "A widow walks the same coastal path each morning until a stranger starts walking beside her.",
+    "Backyard Chefs": "Neighbours swap fences for aprons in a friendly cook-off that gets very competitive.",
+    "Orbit House": "A family of scientists lives on a research station while a quiet mystery grows in the walls.",
+    "The Understudy": "The understudy never gets the part, until opening night, when the lead walks out.",
+    "Mountain Letters": "A postwoman delivers forty years of unsent letters to a village at the end of the line.",
+    "Fast Lane Home": "A courier has ninety minutes to cross the city and get home before the storm closes the roads.",
+    "Pocket Kitchen": "Twelve-minute recipes that fit in a small kitchen and a busy week.",
+    "Tiny Trains of Europe": "A slow ride on the smallest railways in Europe, with the people who keep them running.",
+    "Sunday Comedy Hour": "Five stand-up comics, one small club and a room that is very easy to please.",
+    "Ocean Floor Live": "A live look at the seabed from a research robot, with the divers who steer it."
+  };
+  var DESC = function (t) { return DESCS[t] || ""; };
   var catalog = [], n = 0;
   Object.keys(T).forEach(function (pid) {
     T[pid].forEach(function (r) {
       n++;
       var h = HUES[pid];
-      catalog.push({ title: r[0], sub: r[1], genres: r[2], avail: r[3], kind: r[4], platform: pid, pkg: PKG[pid], desc: DESC,
+      catalog.push({ title: r[0], sub: r[1], genres: r[2], avail: r[3], kind: r[4], platform: pid, pkg: PKG[pid], desc: DESC(r[0]),
         art: art(n, h[0] + (n * 17) % 60, h[1] + (n * 11) % 50), source: "demo" });
     });
   });
   var watching = [["Harbour Lights", "netflix", "S2 E4", 0.62], ["Little Comet", "disney", "1h 12m left", 0.4], ["Night Shift Detectives", "prime", "S3 E7", 0.8],
     ["The Understudy", "appletv", "S1 E3", 0.25]].map(function (w, i) {
     var base = catalog.filter(function (c) { return c.title === w[0]; })[0];
-    return { title: w[0], sub: w[2], platform: w[1], pkg: PKG[w[1]], genres: base.genres, art: art(40 + i, HUES[w[1]][0] + 30, HUES[w[1]][1] + 20), progress: w[3], source: "demo", desc: DESC };
+    return { title: w[0], sub: w[2], platform: w[1], pkg: PKG[w[1]], genres: base.genres, art: art(40 + i, HUES[w[1]][0] + 30, HUES[w[1]][1] + 20), progress: w[3], source: "demo", desc: DESC(w[0]) };
   });
   var picks = [["Friday film night", "netflix"], ["Kids pick", "disney"], ["Documentary night", "youtube"]].map(function (p, i) {
     return { title: p[0], sub: "Your pick", platform: p[1], art: art(70 + i, 150 + i * 40, 190 + i * 40), source: "pick" };

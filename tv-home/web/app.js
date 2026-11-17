@@ -2309,7 +2309,8 @@
     var list = [];
     if (smartOn()) list.push(smartItem());
     if (devOn() && expanded) list.push(devItem());
-    list.push(gearItem());
+    // the top-right Settings button is the way in; the dock keeps a gear tile only when that button is off
+    if (QUICK.indexOf("settings") < 0) list.push(gearItem());
     return list;
   }
 
