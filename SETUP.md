@@ -5,15 +5,15 @@ over the file; the TV cannot write the file back.
 
 | Choice | `config.json` | On the TV (Settings) |
 |---|---|---|
-| Wallpaper or banner | `home.wallpaper` true / false | Look: Wallpaper |
+| Wallpaper or banner | `home.wallpaper` true / false | What's on: Wallpaper |
 | Scenes (wallpapers) | `home.scenes`, from `night golden water fog dawn` | file only |
 | Apps and order | `home.app_order`: Android package names | file only |
-| "What's on ..." row per platform | `home.platform_rows`: `{"netflix": true, ...}` | Platform rows |
-| TMDB | `tmdb`: `{enabled, api_key, region}` | Recommendations: TMDB, TMDB key |
-| Gemini button | `home.gemini` | Top bar: Gemini button |
+| "What's on ..." row per platform | `home.platform_rows`: `{"netflix": true, ...}` | What's on: Rows |
+| TMDB | `tmdb`: `{enabled, api_key, region}` | What's on: TMDB switch (the key goes in the file only) |
+| Gemini button | `home.gemini` | What's on: Gemini button |
 | Clock | `home.clock` system / 12 / 24, `home.show_date` | Look |
-| Own picks | `home.picks`: up to 8 `{title, app or url, image?}` | file only |
-| Weather | `weather`: `{place, lat, lon, timezone}` | file only |
+| Own picks | `home.picks`: up to 8 `{title, app or url, image?}` | Own picks |
+| Weather | `weather`: `{place, lat, lon, timezone}` | Location, Weather |
 
 ## A. Script, or an AI agent following the same steps
 `./setup.sh` (needs `python3`) asks these, one at a time, and writes `config.json` (git-ignored). An agent does

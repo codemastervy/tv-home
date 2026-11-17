@@ -1,0 +1,123 @@
+/* What's on: hero, platform rows, Search, My List, Surprise me. Same tokens, glass, radii and focus
+   ring as the rest of the home (app.css); only the pieces below are new. */
+
+/* ---------- layout: hero, apps, Continue watching, then the rows ---------- */
+.home { transform: translateY(var(--vy, 0rem)); transition: transform 320ms var(--ease); }
+.reco.theme-night .apps { top: 34rem; bottom: auto; }
+.reco.theme-night .shelf { top: 46.5rem; }
+.reco.scrolled .apps, .reco.scrolled2 .shelf { opacity: 0; pointer-events: none; }
+.reco.expanded .reco-hero, .reco.expanded #reco-rows { display: none; }
+#reco-rows { position: absolute; left: var(--safe-x); right: var(--safe-x); top: 59.5rem; }
+.xrow { height: 13.75rem; transition: opacity 240ms var(--ease); }
+.xrow .shelf-head { padding-right: 0; }
+.xrow .shelf-clip { display: block; overflow: hidden; padding: 1.5rem; margin: -1.5rem; }
+.xrow .shelf-track { display: flex; gap: 1.375rem; transition: transform 280ms var(--ease); }
+.xcard { position: relative; flex: none; }
+.xcard .nap { gap: 0.625rem; }
+.xtag { margin-left: auto; padding: 0.0625rem 0.625rem; border-radius: 0.75rem; background: rgba(255, 255, 255, 0.2); color: #fff; letter-spacing: 0.04em; font-size: 1rem; }
+.xmark { position: absolute; top: 0.75rem; right: 0.875rem; display: flex; color: #fff; opacity: 0.85; }
+.xmark svg { width: 1.375rem; height: 1.375rem; fill: currentColor; stroke: none; }
+.xtag + .xmark, .xcard:has(.xtag) .xmark { top: auto; bottom: 0.75rem; }
+
+/* ---------- top right: small clock, then the round buttons ---------- */
+.rclock { position: absolute; right: 0.25rem; top: calc(100% + 1rem); display: flex; align-items: baseline; gap: 0.875rem; line-height: 1; white-space: nowrap; text-shadow: 0 0.125rem 1rem rgba(0, 0, 0, 0.45); transition: opacity 200ms; }
+.rclock b { font-size: 2.125rem; font-weight: 500; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.rclock span { font-size: 1.375rem; color: rgba(255, 255, 255, 0.78); }
+.q-focus .rclock { opacity: 0; }
+/* wallpaper on: couch-tv's own big clock and date are the clock; the small one is for banner mode only */
+.rclock { display: none; }
+.no-wall .rclock { display: flex; }
+.qbtn { position: relative; }
+.qbtn.focus[data-l]::after {
+  content: attr(data-l); position: absolute; top: calc(100% + 0.75rem); right: 0; white-space: nowrap; z-index: 3;
+  padding: 0.4rem 1.125rem; border-radius: 1.25rem; font-size: 1.25rem; line-height: 1.5rem; font-weight: 600; color: #fff;
+  background: rgba(20, 16, 24, 0.72); -webkit-backdrop-filter: blur(1.25rem); backdrop-filter: blur(1.25rem);
+}
+.theme-night .qbtn svg.fillish { fill: currentColor; stroke: none; }
+
+/* ---------- the hero ---------- */
+.reco-hero {
+  position: fixed; z-index: 2; left: var(--safe-x); top: 11rem; width: 36rem; padding: 1.5rem 1.875rem 1.625rem; border-radius: 2rem; color: #fff;
+  background: var(--glass-tint, rgba(30, 20, 28, 0.32)); -webkit-backdrop-filter: var(--glass-blur, blur(1.75rem) saturate(170%)); backdrop-filter: var(--glass-blur, blur(1.75rem) saturate(170%));
+  box-shadow: var(--glass-edge, inset 0 0 0 0.0625rem rgba(255, 210, 220, 0.16)), 0 1.5rem 3.75rem rgba(0, 0, 0, 0.28);
+}
+.reco-hero.none { display: none; }
+.rh-app { display: flex; align-items: center; gap: 0.625rem; font-size: 1.1875rem; line-height: 1.5rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255, 255, 255, 0.62); }
+.rh-app img { width: 1.625rem; height: 1.625rem; border-radius: 0.4375rem; object-fit: cover; }
+.rh-app em { font-style: normal; padding: 0.0625rem 0.625rem; border-radius: 0.75rem; background: rgba(255, 255, 255, 0.2); color: #fff; font-size: 1rem; }
+.rh-title { margin-top: 0.5rem; font-size: 2.5rem; line-height: 2.875rem; font-weight: 620; letter-spacing: -0.01em; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.rh-sub { margin-top: 0.25rem; font-size: 1.375rem; line-height: 1.75rem; color: rgba(255, 255, 255, 0.78); }
+.rh-desc { margin-top: 0.5rem; font-size: 1.1875rem; line-height: 1.625rem; color: rgba(255, 255, 255, 0.62); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.rh-btns { display: flex; gap: 0.875rem; margin-top: 1.25rem; }
+.rbtn {
+  display: inline-flex; align-items: center; gap: 0.625rem; height: 3.5rem; padding: 0 1.75rem; border-radius: 1.75rem; font-size: 1.4375rem; font-weight: 600; white-space: nowrap;
+  background: var(--glass-tint, rgba(30, 20, 28, 0.32)); box-shadow: var(--glass-edge, inset 0 0 0 0.0625rem rgba(255, 210, 220, 0.16));
+  transition: transform 240ms var(--ease), background 240ms var(--ease);
+}
+.rbtn svg { width: 1.5rem; height: 1.5rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; }
+.rbtn.focus { background: #fff; color: #111; transform: scale(1.06); box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.35); }
+
+/* wallpaper off: no scenes, and the hero is a wide banner. Nothing else changes. */
+html.no-wall { background: radial-gradient(120% 90% at 20% 0%, #2b2437 0%, #17131d 55%, #0b0b0e 100%); }
+.no-wall .bg, .no-wall .bgvid, .no-wall .scenes, .no-wall .ambient-lighting, .no-wall .weather-canvas, .no-wall .scrim, .no-wall.theme-night .date { display: none !important; }
+.no-wall .reco-hero { right: var(--safe-x); top: 13.5rem; width: auto; height: 18rem; padding: 0; overflow: hidden; background: #1a1620; -webkit-backdrop-filter: none; backdrop-filter: none; }
+.no-wall .reco-hero::before { content: ""; position: absolute; inset: 0; background-image: var(--art, none); background-size: cover; background-position: center; }
+.no-wall .reco-hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(14, 11, 18, 0.94) 0%, rgba(14, 11, 18, 0.78) 38%, rgba(14, 11, 18, 0.08) 80%); }
+.no-wall .reco-hero.none { display: block; }
+.no-wall .rh-body { position: relative; z-index: 1; width: 62rem; padding: 1.5rem 2.75rem; }
+.no-wall .rh-title { font-size: 2.75rem; line-height: 3.125rem; }
+.no-wall .rh-sub { font-size: 1.5rem; }
+.no-wall .rh-desc { font-size: 1.3125rem; line-height: 1.75rem; max-width: 52rem; }
+
+/* ---------- full screens: Search, My List, Surprise me, the sheet ---------- */
+.reco-ov { display: none; position: fixed; inset: 0; z-index: 40; padding: 4rem var(--safe-x); background: rgba(12, 10, 16, 0.985); color: #fff; }
+.reco-ov.on { display: block; }
+.reco-ov.k-sheet:not(.over) { background: rgba(0, 0, 0, 0.5); }
+.reco-ov h1 { font-size: 3rem; line-height: 3.5rem; font-weight: 620; letter-spacing: -0.01em; }
+.reco-ov h1 small { margin-left: 1.5rem; font-size: 1.5rem; font-weight: 500; color: rgba(255, 255, 255, 0.6); letter-spacing: 0; }
+.reco-ov h2 { margin: 1.5rem 0 1rem; font-size: 1.5625rem; line-height: 2.25rem; font-weight: 600; color: rgba(255, 255, 255, 0.78); }
+.r-none { margin-top: 1.5rem; font-size: 1.75rem; line-height: 2.5rem; color: rgba(255, 255, 255, 0.7); }
+.r-hint { position: absolute; bottom: 2.5rem; left: var(--safe-x); font-size: 1.3125rem; color: rgba(255, 255, 255, 0.55); }
+
+.r-search { display: flex; gap: 4rem; }
+.r-left { width: 48rem; flex: none; }
+.r-query { display: flex; align-items: center; margin: 1.25rem 0 1.5rem; height: 5.5rem; padding: 0 2rem; border-radius: 2.75rem; font-size: 2.5rem; font-weight: 500; white-space: nowrap; overflow: hidden; background: rgba(255, 255, 255, 0.1); box-shadow: inset 0 0 0 0.0625rem rgba(255, 210, 220, 0.16); }
+.r-query.empty { color: rgba(255, 255, 255, 0.45); }
+.r-query .caret { width: 0.1875rem; height: 2.75rem; margin-left: 0.25rem; background: #fff; animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.r-kb { display: grid; grid-template-columns: repeat(8, 5.2rem); gap: 0.6rem; }
+.rkey { display: flex; align-items: center; justify-content: center; height: 5.2rem; border-radius: 1.5rem; font-size: 2rem; font-weight: 500; text-transform: uppercase; background: rgba(255, 255, 255, 0.1); transition: transform 200ms var(--ease), background 200ms var(--ease); }
+.rkey.wide { grid-column: span 2; font-size: 1.4375rem; text-transform: none; }
+.rkey.focus { background: #fff; color: #111; transform: scale(1.06); }
+.r-ask { margin-top: 1.5rem; }
+.r-right { flex: 1; min-width: 0; }
+.r-chips { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.75rem; margin-top: 0.5rem; }
+.rchip { display: flex; justify-content: center; align-items: center; height: 3.75rem; padding: 0 0.5rem; border-radius: 1.875rem; font-size: 1.375rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: rgba(255, 255, 255, 0.1); transition: transform 200ms var(--ease), background 200ms var(--ease); }
+.rchip.on { background: rgba(255, 255, 255, 0.3); box-shadow: inset 0 0 0 0.125rem rgba(255, 255, 255, 0.6); }
+.rchip.focus { background: #fff; color: #111; transform: scale(1.05); }
+.r-res { height: 38rem; overflow: hidden; padding: 1rem; margin: -1rem; }
+.r-res.big { height: 46rem; margin-top: 1rem; }
+.r-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; position: relative; }
+.r-grid.cols3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.r-grid .ncard { width: auto; }
+.r-res .ncard .thumb { width: 9rem; height: 5.0625rem; }
+.r-res .ncard b { font-size: 1.625rem; line-height: 2rem; }
+.r-res .ncard i { font-size: 1.1875rem; }
+.r-res.big .ncard .thumb { width: 10.5rem; height: 5.9375rem; }
+.r-res.big .ncard b { font-size: 1.8125rem; line-height: 2.25rem; }
+
+.r-surprise { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.r-sc { display: flex; width: 100rem; border-radius: 2.5rem; overflow: hidden; background: rgba(255, 255, 255, 0.07); box-shadow: inset 0 0 0 0.0625rem rgba(255, 210, 220, 0.16), 0 1.5rem 3.75rem rgba(0, 0, 0, 0.4); }
+.r-sart { width: 44rem; height: 24.75rem; flex: none; background: rgba(255, 255, 255, 0.08); }
+.r-sart img { width: 100%; height: 100%; object-fit: cover; }
+.r-sbody { padding: 2.5rem 3rem; min-width: 0; }
+.r-sbody .rh-title { font-size: 3.25rem; line-height: 3.75rem; }
+.r-ask-open { margin-top: 1.5rem; font-size: 1.5rem; color: rgba(255, 255, 255, 0.78); }
+.r-sbody .rh-btns { margin-top: 1rem; }
+
+.r-sheet { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); min-width: 38rem; max-width: 56rem; padding: 1rem; border-radius: 2.25rem; background: rgba(28, 24, 30, 0.88); -webkit-backdrop-filter: blur(1.75rem) saturate(170%); backdrop-filter: blur(1.75rem) saturate(170%); box-shadow: inset 0 0 0 0.0625rem rgba(255, 220, 230, 0.16), 0 1.5rem 3.75rem rgba(0, 0, 0, 0.55); }
+.r-sheet-t { padding: 0.75rem 1.25rem 1rem; font-size: 1.5rem; font-weight: 600; color: rgba(255, 255, 255, 0.7); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.r-opt { padding: 0.875rem 1.5rem; border-radius: 1.5rem; font-size: 1.75rem; line-height: 2.25rem; font-weight: 500; color: rgba(255, 255, 255, 0.9); transition: transform 200ms var(--ease), background 200ms var(--ease); }
+.r-opt.focus { background: #fff; color: #111; transform: scale(1.03); }
+
+.reco-full .home, .reco-full .reco-hero, .reco-full .top, .reco-full .scenes, .reco-full .date { visibility: hidden; }

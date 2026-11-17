@@ -1,13 +1,14 @@
 #!/bin/sh
 # No ads: the home may only reference an allowlist of hosts, and none may be an ad/tracker network.
+# Spotify hosts: couch-tv's optional Now playing. images.justwatch.com: only mock.js (browser preview, not shipped logic).
 # api.themoviedb.org and image.tmdb.org are allowed only because TMDB is optional: it must be off in
 # config.example.json and every request in sources.js must sit behind tmdbActive() (tests/test_logic.js
 # also checks that a disabled TMDB makes no request at all).
 cd "$(dirname "$0")/.." || exit 2
-ALLOW='tvos.invalid|github.com|api.github.com|geocoding-api.open-meteo.com|api.open-meteo.com|example.com|www.w3.org'
+ALLOW='tvos.invalid|api-partner.spotify.com|sdk.scdn.co|images.justwatch.com|github.com|api.github.com|geocoding-api.open-meteo.com|api.open-meteo.com|example.com|www.w3.org'
 TMDB='api.themoviedb.org|image.tmdb.org'
 ADS='doubleclick|googlesyndication|adservice|admob|applovin|unity3d.com/ads|adcolony|taboola|outbrain|samba|ads\.|adsrvr|scorecardresearch|tvping|alphonso|ravm|inscape'
-HOSTS=$(grep -rhoE 'https?://[A-Za-z0-9._-]+' tv-home/web/*.js tv-home/web/index.html tv-home/web/home.css \
+HOSTS=$(grep -rhoE 'https?://[A-Za-z0-9._-]+' tv-home/web/*.js tv-home/web/index.html tv-home/web/app.css tv-home/web/reco.css \
   tv-home/android/app/src/main/java | sed -E 's#https?://##' | sort -u)
 bad=0
 tmdb_ok=0
